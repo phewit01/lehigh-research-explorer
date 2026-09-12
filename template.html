@@ -1,0 +1,2066 @@
+<title>Lehigh University Research Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --plane:      #f2f0ec;
+  --surface:    #fbfaf9;
+  --surface-2:  #f5f2ee;
+  --ink:        #1c1512;
+  --ink-2:      #5c534d;
+  --muted:      #8b817a;
+  --grid:       #e5e1da;
+  --rule:       #dcd6ce;
+  --ring:       rgba(28,21,18,.11);
+  --brand:      #6a3a23;
+  --brand-2:    #8b5537;
+  --brand-wash: #efe6e0;
+  --on-brand:   #fdfcfb;
+  --shadow:     0 1px 2px rgba(28,21,18,.05), 0 6px 18px -12px rgba(28,21,18,.18);
+
+  --s1: #2a78d6;  --s2: #eb6834;  --s3: #1baf7a;
+  --s4: #eda100;  --s5: #e87ba4;  --s6: #008300;
+  --s0: #a8a29b;                       /* "no open access" — deliberately inert */
+  --good: #0ca30c;
+  --up:   #2a78d6;                     /* diverging pair: blue rising, red falling, */
+  --down: #e34948;                     /* with the muted neutral as the "from" dot  */
+
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --plane:      #100d0c;
+    --surface:    #1d1816;
+    --surface-2:  #262020;
+    --ink:        #f7f3f0;
+    --ink-2:      #c0b5ae;
+    --muted:      #968b84;
+    --grid:       #302825;
+    --rule:       #3a312d;
+    --ring:       rgba(255,255,255,.10);
+    --brand:      #cf9573;
+    --brand-2:    #e0ab8a;
+    --brand-wash: #2c1f18;
+    --on-brand:   #17110e;
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 6px 20px -14px rgba(0,0,0,.7);
+    --s1: #3987e5;  --s2: #d95926;  --s3: #199e70;
+    --s4: #c98500;  --s5: #d55181;  --s6: #008300;
+    --s0: #4c4642;
+    --good: #0ca30c;
+    --up:   #3987e5;
+    --down: #e66767;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --plane:      #100d0c;
+  --surface:    #1d1816;
+  --surface-2:  #262020;
+  --ink:        #f7f3f0;
+  --ink-2:      #c0b5ae;
+  --muted:      #968b84;
+  --grid:       #302825;
+  --rule:       #3a312d;
+  --ring:       rgba(255,255,255,.10);
+  --brand:      #cf9573;
+  --brand-2:    #e0ab8a;
+  --brand-wash: #2c1f18;
+  --shadow:     0 1px 2px rgba(0,0,0,.4), 0 6px 20px -14px rgba(0,0,0,.7);
+  --s1: #3987e5;  --s2: #d95926;  --s3: #199e70;
+  --s4: #c98500;  --s5: #d55181;  --s6: #008300;
+  --s0: #4c4642;
+  --good: #0ca30c;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--plane);
+  color: var(--ink);
+  font: 400 14px/1.5 var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1280px; margin: 0 auto; padding: 28px 20px 64px; }
+
+/* ---------- masthead ---------- */
+.masthead {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 20px 28px;
+  padding-bottom: 20px; border-bottom: 2px solid var(--ink);
+}
+.mast-id { flex: 1 1 340px; min-width: 0; }
+.eyebrow {
+  font: 500 10.5px/1 var(--f-mono); letter-spacing: .13em; text-transform: uppercase;
+  color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 12px;
+}
+.eyebrow a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.eyebrow a:hover { color: var(--brand); }
+h1 {
+  font: 800 clamp(30px, 5.2vw, 46px)/.98 var(--f-display);
+  letter-spacing: -.028em; margin: 0; text-wrap: balance;
+}
+h1 .thin { color: var(--brand); }
+.standfirst {
+  margin: 10px 0 0; max-width: 62ch; color: var(--ink-2); font-size: 13.5px; line-height: 1.55;
+}
+.mast-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ---------- kpi strip ---------- */
+.kpis {
+  display: grid; gap: 1px; margin: 22px 0 0;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  background: var(--rule); border: 1px solid var(--rule);
+}
+.kpi { background: var(--surface); padding: 14px 16px 15px; }
+.kpi-k {
+  font: 500 10px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted);
+}
+.kpi-v {
+  font: 700 clamp(22px, 2.4vw, 29px)/1.05 var(--f-display);
+  letter-spacing: -.02em; margin-top: 9px; font-variant-numeric: tabular-nums;
+}
+.kpi-n { font: 400 11.5px/1.3 var(--f-body); color: var(--ink-2); margin-top: 5px; }
+.kpi-n b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ---------- filter rail ---------- */
+.rail {
+  position: sticky; top: 0; z-index: 30; margin: 22px 0 0;
+  background: var(--surface); border: 1px solid var(--rule); box-shadow: var(--shadow);
+}
+.rail-row {
+  display: flex; flex-wrap: wrap; gap: 12px 14px; align-items: flex-end; padding: 13px 14px;
+}
+.fld { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.fld > span {
+  font: 500 9.5px/1 var(--f-mono); letter-spacing: .11em; text-transform: uppercase; color: var(--muted);
+  display: flex; gap: 6px; align-items: baseline;
+}
+.rail-row2 { border-top: 1px dashed var(--rule); padding-top: 12px; }
+/* marks a value the page computed rather than received */
+.drv {
+  font-style: normal; letter-spacing: .04em; text-transform: none;
+  color: var(--brand); border-bottom: 1px dotted currentColor; cursor: help;
+}
+.grow { flex: 1 1 240px; }
+input[type="search"], select {
+  font: 400 13px var(--f-body); color: var(--ink); background: var(--surface-2);
+  border: 1px solid var(--rule); border-radius: 3px; padding: 7px 9px; width: 100%;
+  min-width: 0; appearance: none;
+}
+select { padding-right: 26px; background-image: none; cursor: pointer; }
+input[type="search"]::placeholder { color: var(--muted); }
+input[type="search"]:focus-visible, select:focus-visible, button:focus-visible, .seg:focus-visible {
+  outline: 2px solid var(--brand); outline-offset: 1px;
+}
+.years { display: flex; align-items: center; gap: 6px; }
+.years select { width: auto; }
+.years em { color: var(--muted); font-style: normal; }
+
+.seggroup { display: flex; border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
+.seg {
+  font: 500 12px var(--f-body); color: var(--ink-2); background: var(--surface-2);
+  border: 0; border-left: 1px solid var(--rule); padding: 7px 10px; cursor: pointer; white-space: nowrap;
+}
+.seg:first-child { border-left: 0; }
+.seg[aria-pressed="true"] { background: var(--brand); color: var(--on-brand); }
+
+.btn {
+  font: 500 12px var(--f-body); color: var(--ink); background: var(--surface-2);
+  border: 1px solid var(--rule); border-radius: 3px; padding: 7px 11px; cursor: pointer;
+}
+.btn:hover { border-color: var(--brand); color: var(--brand); }
+
+/* chips */
+.chipbar {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  padding: 10px 14px; border-top: 1px solid var(--rule); background: var(--surface-2);
+}
+.chipbar[hidden] { display: none; }
+.chipbar-k {
+  font: 500 9.5px/1 var(--f-mono); letter-spacing: .11em; text-transform: uppercase; color: var(--muted);
+  margin-right: 2px;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 340px;
+  font: 400 12px var(--f-body); color: var(--brand); background: var(--brand-wash);
+  border: 1px solid color-mix(in oklab, var(--brand) 30%, transparent);
+  border-radius: 2px; padding: 3px 4px 3px 8px; cursor: pointer;
+}
+.chip b { font: 500 9.5px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; opacity: .72; }
+.chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip i { font-style: normal; font-size: 14px; line-height: 1; opacity: .6; padding: 0 2px; }
+.chip:hover i { opacity: 1; }
+
+/* ---------- panels ---------- */
+.grid {
+  display: grid; gap: 16px; margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+}
+.panel {
+  background: var(--surface); border: 1px solid var(--rule); padding: 15px 16px 16px; min-width: 0;
+}
+.panel.span2 { grid-column: 1 / -1; }
+.phead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 2px; }
+.phead h2 {
+  font: 600 14.5px/1.2 var(--f-display); letter-spacing: -.01em; margin: 0; flex: 1 1 auto;
+}
+.phead .cnt { font: 500 11px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.psub { font-size: 11.5px; color: var(--muted); margin: 0 0 12px; }
+.psub kbd {
+  font: 500 10px var(--f-mono); border: 1px solid var(--rule); border-radius: 2px;
+  padding: 1px 4px; color: var(--ink-2);
+}
+
+/* ---------- section headings: the grid is four sections, not one wall ---------- */
+.secthead {
+  display: flex; align-items: baseline; gap: 14px; margin: 30px 0 12px;
+  padding-bottom: 7px; border-bottom: 1px solid var(--ink);
+}
+.secthead span {
+  font: 700 13px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink); white-space: nowrap;
+}
+.secthead em {
+  font: 400 11.5px/1.3 var(--f-body); font-style: normal; color: var(--muted);
+}
+.seggroup.tight .seg { padding: 4px 8px; font-size: 11px; }
+
+/* ---------- publishers: stacked OA bars with inline imprint disclosure ---------- */
+.pubrow {
+  display: grid; grid-template-columns: 16px minmax(120px, 200px) minmax(0, 1fr) 52px;
+  gap: 10px; align-items: center; padding: 3px 2px; border-radius: 2px;
+}
+.pubrow.sub { padding-left: 22px; }
+.pubrow.sub .pubname { color: var(--ink-2); font-size: 11.5px; }
+.pubrow:hover { background: var(--surface-2); }
+.pubrow[data-on="1"] { background: var(--brand-wash); }
+.disc {
+  width: 16px; height: 16px; border: 0; background: none; cursor: pointer; padding: 0;
+  color: var(--muted); font-size: 10px; line-height: 1; font-family: var(--f-mono);
+}
+.disc:hover { color: var(--brand); }
+.disc[aria-expanded="true"] { color: var(--brand); }
+.pubname {
+  font-size: 12.5px; text-align: left; background: none; border: 0; padding: 0;
+  color: var(--ink); cursor: pointer; font-family: inherit; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.pubname:hover { color: var(--brand); text-decoration: underline; }
+.pubtrack { display: flex; gap: 2px; height: 13px; min-width: 0; }
+.pubseg { border-radius: 1px; cursor: pointer; }
+.pubtot {
+  font: 500 12px var(--f-mono); color: var(--ink-2); text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.pubrow.sub .pubtot { color: var(--muted); font-size: 11px; }
+
+/* ---------- rising / falling: slope rows on one shared scale ---------- */
+.slope { display: flex; flex-direction: column; gap: 1px; }
+.slopehead {
+  display: grid; grid-template-columns: minmax(120px, 210px) minmax(0, 1fr) 76px;
+  gap: 12px; font: 500 9.5px var(--f-mono); letter-spacing: .09em; text-transform: uppercase;
+  color: var(--muted); padding: 0 2px 5px; border-bottom: 1px solid var(--grid); margin-bottom: 4px;
+}
+.sloperow {
+  display: grid; grid-template-columns: minmax(120px, 210px) minmax(0, 1fr) 76px;
+  gap: 12px; align-items: center; padding: 5px 2px; border: 0; background: none;
+  text-align: left; font: inherit; color: inherit; cursor: pointer; border-radius: 2px;
+}
+.sloperow:hover { background: var(--surface-2); }
+.sloperow[aria-pressed="true"] { background: var(--brand-wash); }
+.slopename {
+  font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.slopetrack { position: relative; height: 16px; min-width: 0; }
+.slopeline { position: absolute; top: 7px; height: 2px; border-radius: 1px; }
+.slopedot {
+  position: absolute; top: 3px; width: 10px; height: 10px; border-radius: 50%;
+  margin-left: -5px; box-sizing: border-box; border: 2px solid var(--surface);
+}
+.slopedot.from { background: var(--muted); }
+.slopedelta {
+  font: 500 11.5px var(--f-mono); text-align: right; font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.up { color: var(--up); }
+.down { color: var(--down); }
+.slopesplit {
+  font: 500 9.5px var(--f-mono); letter-spacing: .09em; text-transform: uppercase;
+  color: var(--muted); margin: 14px 0 6px; padding-top: 10px; border-top: 1px dashed var(--rule);
+}
+
+/* ---------- SDG wheel ---------- */
+.sdgwrap {
+  display: grid; grid-template-columns: minmax(300px, 1fr) minmax(260px, 1fr);
+  gap: 20px; align-items: start;
+}
+@media (max-width: 760px) { .sdgwrap { grid-template-columns: 1fr; } }
+.wheel { width: 100%; height: auto; display: block; overflow: visible; }
+.wheel text { font-family: var(--f-mono); fill: var(--muted); }
+.wedge { cursor: pointer; }
+.wedge:hover path { opacity: .8; }
+.wedge[aria-pressed="true"] path { stroke: var(--ink); stroke-width: 2; }
+.wheelring { fill: none; stroke: var(--grid); stroke-width: 1; }
+.wheelcore {
+  font: 700 22px var(--f-display); fill: var(--ink); letter-spacing: -.02em;
+}
+.wheelcore-k { font: 500 8.5px var(--f-mono); letter-spacing: .1em; fill: var(--muted); }
+.sdglist { display: flex; flex-direction: column; gap: 1px; }
+.sdgrow {
+  display: grid; grid-template-columns: 22px minmax(0, 1fr) 40px 42px; gap: 8px;
+  align-items: center; padding: 3px 3px; border: 0; background: none; cursor: pointer;
+  text-align: left; font: inherit; color: inherit; border-radius: 2px;
+}
+.sdgrow:hover { background: var(--surface-2); }
+.sdgrow[aria-pressed="true"] { background: var(--brand-wash); }
+.sdgnum {
+  font: 600 9.5px var(--f-mono); color: var(--on-brand); border-radius: 2px;
+  padding: 2px 0; text-align: center;
+}
+.sdgname {
+  font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.sdgbar { height: 7px; border-radius: 0 2px 2px 0; }
+.sdgval {
+  font: 500 11.5px var(--f-mono); color: var(--ink-2); text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- progressive disclosure on the ranked panels ---------- */
+.moresearch { margin: 0 0 9px; }
+.moresearch input[type="search"] {
+  font-size: 12px; padding: 5px 8px; background: var(--surface-2);
+}
+.morefoot {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--grid);
+}
+.morecount {
+  font: 500 10.5px var(--f-mono); color: var(--muted); margin-right: auto;
+  font-variant-numeric: tabular-nums;
+}
+.morebtn {
+  font: 500 11px var(--f-body); color: var(--brand); background: var(--brand-wash);
+  border: 1px solid color-mix(in oklab, var(--brand) 26%, transparent);
+  border-radius: 2px; padding: 4px 9px; cursor: pointer; white-space: nowrap;
+}
+.morebtn:hover { background: var(--brand); color: var(--on-brand); border-color: var(--brand); }
+.morebtn.ghost { color: var(--ink-2); background: none; border-color: var(--rule); }
+.morebtn.ghost:hover { color: var(--brand); background: none; border-color: var(--brand); }
+/* revealed lists scroll in place so the page doesn't grow without bound */
+.bars.scroller {
+  max-height: 340px; overflow-y: auto; overscroll-behavior: contain;
+  padding-right: 4px; margin-right: -4px;
+}
+.bars.scroller::-webkit-scrollbar { width: 9px; }
+.bars.scroller::-webkit-scrollbar-thumb {
+  background: var(--rule); border-radius: 9px;
+  border: 3px solid var(--surface);
+}
+
+/* horizontal bar lists */
+.bars { display: flex; flex-direction: column; gap: 2px; }
+.bar {
+  display: grid; grid-template-columns: minmax(0, 1fr) 44px; align-items: center;
+  gap: 10px; padding: 3px 4px; border: 0; background: none; cursor: pointer;
+  text-align: left; font: inherit; color: inherit; border-radius: 2px;
+}
+.bar:hover { background: var(--surface-2); }
+.bar[aria-pressed="true"] { background: var(--brand-wash); }
+.bar-l { min-width: 0; }
+.bar-t {
+  font-size: 12.5px; color: var(--ink); white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; margin-bottom: 3px;
+}
+.bar-track { height: 9px; background: var(--surface-2); border-radius: 0 2px 2px 0; }
+.bar-fill { height: 9px; border-radius: 0 4px 4px 0; min-width: 2px; }
+.bar-v {
+  font: 500 12px var(--f-mono); color: var(--ink-2); text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* stacked oa rows */
+.stack { display: flex; flex-direction: column; gap: 3px; }
+.srow { display: grid; grid-template-columns: 38px minmax(0,1fr) 46px; gap: 10px; align-items: center; }
+.srow > .yr { font: 500 11.5px var(--f-mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.strack { display: flex; gap: 2px; height: 15px; }
+.sseg { flex-basis: 0; border-radius: 1px; position: relative; }
+.srow > .tot { font: 500 11.5px var(--f-mono); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+
+/* legend */
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 12px; }
+.lgi {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-2);
+  border: 0; background: none; padding: 2px 0; cursor: pointer; font-family: inherit;
+}
+.lgi:hover { color: var(--ink); }
+.lgi[aria-pressed="true"] { color: var(--ink); font-weight: 600; }
+.sw { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.lgi .pct { font: 500 11px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* svg charts */
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { font-family: var(--f-mono); font-size: 9.5px; fill: var(--muted); }
+.chart .axl { fill: var(--ink-2); }
+.gridline { stroke: var(--grid); stroke-width: 1; }
+.baseline { stroke: var(--rule); stroke-width: 1; }
+.col { cursor: pointer; }
+.col rect.hit { fill: transparent; }
+.col:hover rect.mark { opacity: .78; }
+.col[aria-pressed="true"] rect.mark { stroke: var(--ink); stroke-width: 1.5; }
+.refline { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
+
+/* tooltip */
+.tip {
+  position: fixed; z-index: 80; pointer-events: none; opacity: 0; transform: translate(-50%, -100%);
+  background: var(--surface); color: var(--ink); border: 1px solid var(--ring);
+  box-shadow: var(--shadow); padding: 7px 9px; border-radius: 3px; max-width: 260px;
+  font-size: 12px; line-height: 1.4; transition: opacity .1s;
+}
+.tip b { font: 600 12px var(--f-display); display: block; margin-bottom: 2px; }
+.tip .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- table ---------- */
+.tblwrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+thead th {
+  position: sticky; top: 0; background: var(--surface); text-align: left; white-space: nowrap;
+  font: 500 9.5px var(--f-mono); letter-spacing: .09em; text-transform: uppercase; color: var(--muted);
+  border-bottom: 1px solid var(--ink); padding: 7px 9px 7px 0; z-index: 2;
+}
+thead th.srt { cursor: pointer; }
+thead th.srt:hover { color: var(--brand); }
+thead th[aria-sort] { color: var(--ink); }
+thead th .ar { color: var(--brand); }
+tbody td { padding: 9px 9px 9px 0; border-bottom: 1px solid var(--grid); vertical-align: top; }
+tbody tr:hover { background: var(--surface-2); }
+.c-yr { font: 500 12px var(--f-mono); color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.c-ti { min-width: 260px; max-width: 520px; }
+.c-ti a { color: var(--ink); text-decoration: none; font-weight: 500; }
+.c-ti a:hover { color: var(--brand); text-decoration: underline; }
+.c-au { font-size: 11.5px; color: var(--ink-2); margin-top: 3px; }
+.c-au em { font-style: normal; color: var(--muted); }
+.c-un { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+.unit, .fu {
+  font: 500 9.5px var(--f-mono); letter-spacing: .04em; padding: 2px 5px; border-radius: 2px;
+  cursor: help; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px;
+}
+.unit { color: var(--brand); background: var(--brand-wash); }
+.unit.none { color: var(--muted); background: var(--surface-2); border: 1px dashed var(--rule); }
+.fu { color: var(--ink-2); background: var(--surface-2); }
+/* institutional fact rather than inferred — solid fill, not a wash */
+.lwtag {
+  font: 600 9.5px var(--f-mono); letter-spacing: .04em; padding: 2px 5px; border-radius: 2px;
+  cursor: help; white-space: nowrap; background: var(--brand); color: var(--on-brand);
+}
+footer #foot-lw { flex: 1 1 100%; }
+.corr {
+  color: var(--s6); font-size: 12px; margin-right: 4px; cursor: help; vertical-align: 1px;
+}
+.c-src { max-width: 200px; font-size: 11.5px; color: var(--ink-2); }
+.c-n { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.c-n.hi { font-weight: 600; }
+.tag {
+  display: inline-block; font: 500 9.5px var(--f-mono); letter-spacing: .05em; text-transform: uppercase;
+  padding: 2px 5px; border-radius: 2px; white-space: nowrap; border: 1px solid transparent;
+}
+.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+.fwci-w { color: var(--good); font-weight: 600; }
+.retr { color: #d03b3b; font-weight: 600; font-size: 10.5px; letter-spacing: .04em; }
+.pager { display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+.pager .st { font: 500 11.5px var(--f-mono); color: var(--muted); margin-right: auto; font-variant-numeric: tabular-nums; }
+.empty { padding: 34px 8px; text-align: center; color: var(--muted); font-size: 13px; }
+.empty b { display: block; font: 600 15px var(--f-display); color: var(--ink); margin-bottom: 6px; }
+
+footer {
+  margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--rule);
+  display: flex; flex-wrap: wrap; gap: 16px 32px; font-size: 11.5px; color: var(--muted);
+}
+footer div { flex: 1 1 260px; }
+footer b { display: block; font: 500 9.5px var(--f-mono); letter-spacing: .11em;
+  text-transform: uppercase; color: var(--ink-2); margin-bottom: 5px; }
+footer a { color: var(--brand); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+@media (max-width: 640px) {
+  .wrap { padding: 20px 14px 48px; }
+  .rail { position: static; }
+  .c-src { display: none; }
+}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="mast-id">
+      <div class="eyebrow">
+        <span>OpenAlex&nbsp;·&nbsp;I186143895</span>
+        <span>ROR&nbsp;012afjb06</span>
+        <span id="mast-fetched"></span>
+      </div>
+      <h1>Lehigh University<br>Research <span class="thin">Explorer</span></h1>
+      <p class="standfirst">
+        Every work in OpenAlex with at least one author affiliated to Lehigh University
+        or a unit in its lineage, published 2016&ndash;2026. Filter the corpus with the
+        controls below &mdash; every figure, chart and row on this page responds, and the
+        bars themselves are filters.
+      </p>
+    </div>
+    <div class="mast-actions">
+      <button class="btn" id="theme" type="button" title="Switch light / dark">Theme</button>
+    </div>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Summary of the current selection"></section>
+
+  <section class="rail" aria-label="Filters">
+    <div class="rail-row">
+      <label class="fld grow">
+        <span>Search title, Lehigh author, venue</span>
+        <input type="search" id="q" placeholder="e.g. photovoltaic, machine learning, Nature" autocomplete="off">
+      </label>
+      <label class="fld">
+        <span>Field</span>
+        <select id="field"></select>
+      </label>
+      <label class="fld">
+        <span>Work type</span>
+        <select id="type"></select>
+      </label>
+      <div class="fld">
+        <span>Published</span>
+        <div class="years">
+          <select id="y0" aria-label="From year"></select>
+          <em>&ndash;</em>
+          <select id="y1" aria-label="To year"></select>
+        </div>
+      </div>
+      <label class="fld">
+        <span>Citations</span>
+        <select id="cit">
+          <option value="0">Any</option>
+          <option value="1">1 or more</option>
+          <option value="10">10 or more</option>
+          <option value="50">50 or more</option>
+          <option value="100">100 or more</option>
+        </select>
+      </label>
+    </div>
+    <div class="rail-row rail-row2">
+      <label class="fld grow">
+        <span>Funder <i class="drv" id="lbl-fund" title="From OpenAlex funder records. Works naming no funder are absent from this list, so counts are a floor.">coverage</i></span>
+        <select id="fund"></select>
+      </label>
+      <label class="fld grow">
+        <span>Department <i class="drv" id="lbl-dept" title="Derived from the publisher's raw affiliation string — not an OpenAlex field. Read the note at the foot of the page before using this filter.">derived</i></span>
+        <select id="dept"></select>
+      </label>
+      <div class="fld">
+        <span>Co-authorship</span>
+        <div class="seggroup" id="collab" role="group" aria-label="Co-authorship">
+          <button class="seg" type="button" data-v="any" aria-pressed="true">All</button>
+          <button class="seg" type="button" data-v="intl" aria-pressed="false">International</button>
+          <button class="seg" type="button" data-v="solo" aria-pressed="false">Lehigh only</button>
+        </div>
+      </div>
+      <div class="fld" id="fld-lw" hidden>
+        <span>Read &amp; publish OA <i class="drv" id="lbl-lw" title="APC waivers and discounts under the Libraries' read-and-publish agreements with publishers, matched to OpenAlex by DOI. Covers agreement years 2024 onwards ONLY. This is one funding route, not all library support for open access — the Libraries also fund and support OA in ways this sheet does not track.">2024&ndash;26 only</i></span>
+        <div class="seggroup" id="lw" role="group" aria-label="Library-supported open access">
+          <button class="seg" type="button" data-v="any" aria-pressed="true">All works</button>
+          <button class="seg" type="button" data-v="yes" aria-pressed="false">Read &amp; publish</button>
+        </div>
+      </div>
+      <div class="fld">
+        <span>Corresponding author <i class="drv" id="lbl-corr" title="Publishers mark a corresponding author on only part of these works; the rest are genuinely unknown, not negative.">recorded</i></span>
+        <div class="seggroup" id="corr" role="group" aria-label="Corresponding author">
+          <button class="seg" type="button" data-v="any" aria-pressed="true">All</button>
+          <button class="seg" type="button" data-v="lehigh" aria-pressed="false">Lehigh</button>
+          <button class="seg" type="button" data-v="other" aria-pressed="false">Elsewhere</button>
+          <button class="seg" type="button" data-v="none" aria-pressed="false">Not recorded</button>
+        </div>
+      </div>
+    </div>
+    <div class="chipbar" id="chipbar" hidden>
+      <span class="chipbar-k">Active</span>
+    </div>
+  </section>
+
+  <h2 class="secthead"><span>Output</span><em>How much, how cited, in which subjects</em></h2>
+  <div class="grid">
+    <section class="panel">
+      <div class="phead"><h2>Output by year</h2><span class="cnt" id="cnt-year"></span></div>
+      <p class="psub">Works published per calendar year. <kbd>Click</kbd> a column to isolate that year.</p>
+      <div id="ch-year"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Citation impact by year</h2><span class="cnt" id="cnt-fwci"></span></div>
+      <p class="psub">Mean FWCI &mdash; citations relative to the world average for the same field, year and type. 1.0 is parity.</p>
+      <div id="ch-fwci"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Fields</h2><span class="cnt" id="cnt-field"></span></div>
+      <p class="psub">Primary topic&rsquo;s field, OpenAlex taxonomy. <kbd>Click</kbd> to filter.</p>
+      <div id="ch-field"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Subfields</h2><span class="cnt" id="cnt-sub"></span></div>
+      <p class="psub">One level below field &mdash; the finest grain in the OpenAlex taxonomy.</p>
+      <div id="ch-sub"></div>
+    </section>
+  </div>
+
+  <h2 class="secthead"><span>Publishing</span><em>Who published it, and how open it came out</em></h2>
+  <div class="grid">
+    <section class="panel span2">
+      <div class="phead">
+        <h2>Publishers</h2>
+        <div class="seggroup tight" id="pubmode" role="group" aria-label="Publisher grouping">
+          <button class="seg" type="button" data-v="parent" aria-pressed="true">Parent company</button>
+          <button class="seg" type="button" data-v="imprint" aria-pressed="false">Imprint</button>
+        </div>
+        <span class="cnt" id="cnt-pub"></span>
+      </div>
+      <p class="psub">
+        Bars split by open-access route. Imprints are rolled up using OpenAlex&rsquo;s own publisher
+        lineage &mdash; <kbd>Click ▸</kbd> to expand a parent into its imprints, or the bar to filter.
+        Repositories are kept separate from publishers.
+      </p>
+      <div id="ch-pub"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Open access</h2><span class="cnt" id="cnt-oa"></span></div>
+      <p class="psub">Route to the version of record, by year. <kbd>Click</kbd> a route in the key to filter.</p>
+      <div id="ch-oa"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Venues</h2><span class="cnt" id="cnt-src"></span></div>
+      <p class="psub">Journal, proceedings or repository of the primary location.</p>
+      <div id="ch-src"></div>
+    </section>
+  </div>
+
+  <h2 class="secthead"><span>Collaboration &amp; support</span><em>People, partners, funders, units</em></h2>
+  <div class="grid">
+    <section class="panel">
+      <div class="phead"><h2>Lehigh authors</h2><span class="cnt" id="cnt-auth"></span></div>
+      <p class="psub">Credited with a Lehigh affiliation on the work.</p>
+      <div id="ch-auth"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Partner institutions</h2><span class="cnt" id="cnt-inst"></span></div>
+      <p class="psub">Non&ndash;Lehigh affiliations appearing alongside Lehigh on the byline.</p>
+      <div id="ch-inst"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Funders</h2><span class="cnt" id="cnt-fund"></span></div>
+      <p class="psub">Acknowledged in the work&rsquo;s funder record. A work with several funders counts under each.</p>
+      <div id="ch-fund"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Departments</h2><span class="cnt" id="cnt-dept"></span></div>
+      <p class="psub">
+        <span class="drv" title="Not an OpenAlex field.">Derived</span> from raw affiliation
+        strings &mdash; see the note below before quoting these. Interdisciplinary strings count under each unit.
+      </p>
+      <div id="ch-dept"></div>
+    </section>
+
+  </div>
+
+  <h2 class="secthead"><span>Direction</span><em>Where the work is heading, and what it speaks to</em></h2>
+  <div class="grid">
+    <section class="panel span2">
+      <div class="phead"><h2>Rising &amp; falling subfields</h2><span class="cnt" id="cnt-rise"></span></div>
+      <p class="psub">
+        Works per subfield in <b>2016&ndash;2020</b> against <b>2021&ndash;2025</b> &mdash; two equal
+        five-year windows. 2026 is excluded because it is a partial year and would drag every
+        subfield downwards. Subfields under 25 works across both windows are omitted, since a
+        handful of papers produces meaningless percentages. <kbd>Click</kbd> a row to filter.
+      </p>
+      <div id="ch-rise"></div>
+    </section>
+
+    <section class="panel span2">
+      <div class="phead">
+        <h2>Sustainable Development Goals</h2>
+        <span class="cnt" id="cnt-sdg"></span>
+      </div>
+      <p class="psub">
+        OpenAlex classifies each work against the 17 UN goals; a work can serve several, and only
+        predictions at or above 0.4 confidence are counted. Spoke length is works tagged to that
+        goal &mdash; read exact figures in the ranking beside it. <kbd>Click</kbd> a goal to filter.
+      </p>
+      <div class="sdgwrap">
+        <div id="ch-sdg-wheel"></div>
+        <div id="ch-sdg-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel span2" style="margin-top:16px">
+    <div class="phead"><h2>Works</h2><span class="cnt" id="cnt-tbl"></span></div>
+    <p class="psub">Titles link to the publisher via DOI where one exists, otherwise to the OpenAlex record.</p>
+    <div class="tblwrap">
+      <table id="tbl">
+        <thead><tr>
+          <th class="srt" data-s="date" style="width:64px">Date</th>
+          <th>Title &amp; Lehigh authors</th>
+          <th>Venue</th>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Access</th>
+          <th class="srt" data-s="cited" style="text-align:right">Cited</th>
+          <th class="srt" data-s="fwci" style="text-align:right">FWCI</th>
+          <th style="text-align:right">Refs</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="tbl-empty"></div>
+    <div class="pager">
+      <span class="st" id="pg-st"></span>
+      <button class="btn" id="pg-prev" type="button">Previous</button>
+      <button class="btn" id="pg-next" type="button">Next</button>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <b>Source</b>
+      Works, citation counts and FWCI from the
+      <a href="https://openalex.org/I186143895" target="_blank" rel="noopener">OpenAlex</a>
+      institution record for Lehigh University (<span id="foot-fetched"></span>). OpenAlex data is
+      CC0. This page holds a snapshot &mdash; it does not query the API live.
+    </div>
+    <div>
+      <b>Reading the numbers</b>
+      FWCI is field-weighted citation impact: 1.0 means a work is cited at the world average
+      for its field, year and type. It is undefined for very recent or unclassified works, which
+      are excluded from FWCI means rather than counted as zero.
+    </div>
+    <div>
+      <b>Caveats</b>
+      2026 is a partial year. Affiliation coverage depends on how publishers tag it, so
+      counts run slightly low, and author name variants are not merged beyond OpenAlex&rsquo;s own
+      disambiguation. &ldquo;Lehigh only&rdquo; means no other institution appears on the byline.
+      Funders are named on <b id="foot-fund"></b> of works, so funder counts are a floor, not a total.
+    </div>
+    <div>
+      <b>Departments are derived &mdash; read this</b>
+      OpenAlex has no department or college field. The unit shown is parsed out of the
+      publisher&rsquo;s raw affiliation string, and only <b id="foot-dept"></b> of works name one at all;
+      the rest say just &ldquo;Lehigh University&rdquo; and sit in <i>unit not stated</i>. Hover any unit chip
+      to see the string it came from. Four limits are inherent: renamed units split a time series
+      (Chemical Engineering &rarr; Chemical &amp; Biomolecular Engineering); the string is what an author
+      typed on that paper, so joint and courtesy appointments are invisible; interdisciplinary
+      strings count under every unit they name; and a few hospital departments arrive via health-network
+      records matched to Lehigh. <b>Colleges are deliberately absent</b> &mdash; mapping departments to the
+      five colleges would be inference on top of a 49% sample, and the hard cases (Bioengineering,
+      Psychology, Economics, Community &amp; Population Health) are exactly the ones that would mislead.
+      Use Lehigh&rsquo;s own faculty-activity system for anything evaluative.
+    </div>
+    <div id="foot-lw" hidden>
+      <b>Read &amp; publish OA &mdash; one funding route, <span id="lw-years"></span> only</b>
+      <b style="display:inline;text-transform:none;letter-spacing:0;font-size:11.5px;color:var(--brand)">
+        This flag covers APC waivers and discounts under the Libraries&rsquo; read-and-publish
+        agreements with publishers. It is not a measure of library support for open access
+        generally.</b>
+      The Libraries support OA through other routes this sheet does not track &mdash; the
+      institutional repository, subvention and membership funds, consultation, and infrastructure
+      support among them &mdash; and none of those appear here. Two further limits.
+      <b style="display:inline;text-transform:none;letter-spacing:0;font-size:11.5px;color:var(--brand)">
+        Absence of the flag does not mean a work was unsupported:</b>
+      the data begins at agreement year <span id="lw-first"></span>, so anything earlier is
+      unflagged because no record exists, and flagged counts must never be compared across the
+      full 2016&ndash;2026 range. Note too that the agreement year is when the APC was approved,
+      not when the article appeared: they differ for <b>15</b> of these works, and one flagged
+      article carries a 2024 agreement but a 2023 publication date. And matching is by DOI: of
+      <span id="lw-rows"></span> rows in the
+      sheet, <b id="lw-n"></b> matched a work here; <span id="lw-unmatched"></span> did not, nearly
+      all very recent papers absent from this snapshot. Author names and email addresses from the
+      sheet are deliberately excluded from this page.
+    </div>
+    <div>
+      <b>Publishers</b>
+      Imprints are rolled up to the parent company using OpenAlex&rsquo;s own
+      <i>host_organization_lineage</i>, not a mapping written here &mdash; so Nature Portfolio,
+      Springer Science+Business Media and BioMed Central all sit under Springer Nature, and the
+      Imprint view splits them again. Six parents are renamed for legibility only (a university
+      press otherwise appears as its university, and IEEE and MDPI appear in full). A publisher is
+      named on <b id="foot-pub"></b> of works; conference papers are the bulk of the remainder.
+      Repositories and preprint servers &mdash; arXiv, SSRN, bioRxiv, Zenodo, Lehigh Preserve &mdash;
+      are held in their own bucket, since hosting a paper is not publishing it.
+    </div>
+    <div>
+      <b>Sustainable Development Goals</b>
+      Goal tags are machine predictions made by OpenAlex, not author or publisher declarations,
+      and only those at 0.4 confidence or above are counted &mdash; <b id="foot-sdg"></b> of works
+      carry at least one. A work can be tagged to several goals, so the spokes sum to more than the
+      work count. Spoke length encodes works, but a wedge&rsquo;s <i>area</i> grows faster than its
+      value, so compare exact figures in the ranked list rather than by eye.
+    </div>
+    <div>
+      <b>Corresponding author</b>
+      Publishers mark one on <b id="foot-corr"></b> of these works. The filter therefore has three
+      states, not two: Lehigh, elsewhere, and not recorded. &ldquo;Not recorded&rdquo; is unknown &mdash;
+      treating it as &ldquo;not Lehigh&rdquo; would understate Lehigh-led output by a wide margin.
+    </div>
+  </footer>
+</div>
+
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script type="application/json" id="payload">/*__DATA__*/</script>
+<script>
+(function () {
+  "use strict";
+
+  var RAW = JSON.parse(document.getElementById("payload").textContent);
+  var T = RAW.tables, META = RAW.meta;
+  var I = {}; RAW.cols.forEach(function (c, i) { I[c] = i; });
+
+  /* ---------- decode ---------- */
+  var TYPE_LABEL = {
+    "article": "Article", "conference-paper": "Conference paper", "preprint": "Preprint",
+    "book-chapter": "Book chapter", "conference-abstract": "Conference abstract",
+    "dataset": "Dataset", "book-review": "Book review", "review": "Review",
+    "editorial": "Editorial", "book": "Book", "reference-entry": "Reference entry",
+    "report": "Report", "erratum": "Erratum", "software": "Software", "paratext": "Paratext",
+    "peer-review": "Peer review", "dissertation": "Dissertation", "data-paper": "Data paper",
+    "supplementary-materials": "Supplementary materials", "letter": "Letter",
+    "software-paper": "Software paper", "retraction": "Retraction", "other": "Other",
+    "libguides": "Library guide", "standard": "Standard", "grant": "Grant"
+  };
+  /* Routes are ordered so that adjacent fills in the stack are the validated
+     adjacent pairs of the categorical palette; "closed" gets the inert neutral. */
+  var OA_ORDER = ["closed", "bronze", "hybrid", "green", "gold", "diamond"];
+  var OA_META = {
+    closed:  { label: "Closed",  v: "--s0", note: "no free version located" },
+    bronze:  { label: "Bronze",  v: "--s1", note: "free on the publisher site, no licence" },
+    hybrid:  { label: "Hybrid",  v: "--s2", note: "open article in a subscription venue" },
+    green:   { label: "Green",   v: "--s3", note: "repository copy" },
+    gold:    { label: "Gold",    v: "--s4", note: "fully open venue, APC model" },
+    diamond: { label: "Diamond", v: "--s5", note: "fully open venue, no APC" },
+    unknown: { label: "Unknown", v: "--s0", note: "not determined" }
+  };
+
+  var W = RAW.rows.map(function (r) {
+    var la = r[I.la], src = T.src[r[I.src]] || "", fld = T.fld[r[I.fld]] || "";
+    var cc = r[I.cc].map(function (i) { return T.ctry[i]; });
+    return {
+      id: r[I.id], t: r[I.t], y: r[I.y], d: r[I.d],
+      ty: T.ty[r[I.ty]] || "other", c: r[I.c], f: r[I.f],
+      oa: T.oa[r[I.oa]] || "unknown",
+      src: src, top: T.top[r[I.top]] || "", sub: T.sub[r[I.sub]] || "",
+      fld: fld, dom: T.dom[r[I.dom]] || "",
+      la: la, na: r[I.na],
+      ci: r[I.ci].map(function (i) { return T.inst[i]; }),
+      cc: cc,
+      intl: cc.some(function (c) { return c !== "US"; }),
+      solo: r[I.ci].length === 0,
+      doi: r[I.doi], rt: r[I.rt] === 1, rf: r[I.rf],
+      lw: r[I.lw] || null,
+      co: r[I.co], cn: r[I.cn],
+      dept: r[I.dept].map(function (i) { return T.dept[i]; }),
+      fund: r[I.fund].map(function (i) { return T.fund[i]; }),
+      aw: r[I.aw], bare: r[I.bare],
+      pub: T.pub[r[I.pub]] || "", imp: T.imp[r[I.imp]] || "", sdg: r[I.sdg],
+      key: (r[I.t] + " " + la.join(" ") + " " + src + " " + fld + " " +
+            r[I.fund].map(function (i) { return T.fund[i]; }).join(" ") + " " +
+            r[I.aw].join(" ") + " " +
+            r[I.dept].map(function (i) { return T.dept[i]; }).join(" ")).toLowerCase(),
+      sk: r[I.y] * 10000 + (r[I.d] ? (+r[I.d].slice(0, 2) * 100 + +r[I.d].slice(3, 5)) : 0)
+    };
+  });
+
+  var YEARS = [];
+  for (var yy = META.years[0]; yy <= META.years[1]; yy++) YEARS.push(yy);
+
+  /* ---------- state ---------- */
+  var S = {
+    q: "", y0: META.years[0], y1: META.years[1], field: "", type: "", cit: 0,
+    collab: "any", oa: "", src: "", inst: "", auth: "", sub: "",
+    dept: "", fund: "", corr: "any", lw: "any",
+    pub: "", imp: "", sdg: 0, pubmode: "parent",
+    sort: "cited", dir: -1, page: 1
+  };
+  var expanded = Object.create(null);   /* publisher rows opened for imprint detail */
+
+  /* Official UN goal numbering, short names and palette. This is an external
+     documented standard, so the colours are fixed rather than drawn from the
+     chart palette — identity is always carried by the number and name too,
+     never by hue alone. */
+  var SDG = [
+    [1, "No poverty", "#E5243B"], [2, "Zero hunger", "#DDA63A"],
+    [3, "Good health & well-being", "#4C9F38"], [4, "Quality education", "#C5192D"],
+    [5, "Gender equality", "#FF3A21"], [6, "Clean water & sanitation", "#26BDE2"],
+    [7, "Affordable & clean energy", "#FCC30B"], [8, "Decent work & economic growth", "#A21942"],
+    [9, "Industry, innovation & infrastructure", "#FD6925"], [10, "Reduced inequalities", "#DD1367"],
+    [11, "Sustainable cities & communities", "#FD9D24"],
+    [12, "Responsible consumption & production", "#BF8B2E"],
+    [13, "Climate action", "#3F7E44"], [14, "Life below water", "#0A97D9"],
+    [15, "Life on land", "#56C02B"], [16, "Peace, justice & strong institutions", "#00689D"],
+    [17, "Partnerships for the goals", "#19486A"]
+  ];
+  var SDG_BY_N = {};
+  SDG.forEach(function (s) { SDG_BY_N[s[0]] = { n: s[0], name: s[1], c: s[2] }; });
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+  var num = function (n) { return n.toLocaleString("en-US"); };
+  var MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  /* ---------- filtering ---------- */
+  function pass(w, skip) {
+    if (S.q && w.key.indexOf(S.q) < 0) return false;
+    if (skip !== "year" && (w.y < S.y0 || w.y > S.y1)) return false;
+    if (skip !== "field" && S.field && w.fld !== S.field) return false;
+    if (S.sub && w.sub !== S.sub) return false;
+    if (S.type && w.ty !== S.type) return false;
+    if (w.c < S.cit) return false;
+    if (S.collab === "intl" && !w.intl) return false;
+    if (S.collab === "solo" && !w.solo) return false;
+    if (skip !== "oa" && S.oa && w.oa !== S.oa) return false;
+    if (S.src && w.src !== S.src) return false;
+    if (S.inst && w.ci.indexOf(S.inst) < 0) return false;
+    if (S.auth && w.la.indexOf(S.auth) < 0) return false;
+    if (skip !== "dept" && S.dept && w.dept.indexOf(S.dept) < 0) return false;
+    if (skip !== "fund" && S.fund && w.fund.indexOf(S.fund) < 0) return false;
+    if (S.corr === "lehigh" && w.co !== 1) return false;
+    if (S.corr === "other" && w.co !== 0) return false;
+    if (S.corr === "none" && w.co !== -1) return false;
+    if (skip !== "pub" && S.pub && w.pub !== S.pub) return false;
+    if (skip !== "pub" && S.imp && w.imp !== S.imp) return false;
+    if (skip !== "sdg" && S.sdg && w.sdg.indexOf(S.sdg) < 0) return false;
+    if (S.lw === "yes" && !w.lw) return false;
+    return true;
+  }
+  function select(skip) {
+    var out = [];
+    for (var i = 0; i < W.length; i++) if (pass(W[i], skip)) out.push(W[i]);
+    return out;
+  }
+
+  /* ---------- tooltip ---------- */
+  var tip = $("tip");
+  function showTip(html, x, y) {
+    tip.innerHTML = html; tip.style.opacity = "1";
+    tip.style.left = Math.max(134, Math.min(window.innerWidth - 134, x)) + "px";
+    tip.style.top = (y - 10) + "px";
+  }
+  function hideTip() { tip.style.opacity = "0"; }
+  function bindTip(el, html) {
+    el.addEventListener("mouseenter", function (e) {
+      var r = el.getBoundingClientRect();
+      showTip(html, r.left + r.width / 2, r.top);
+    });
+    el.addEventListener("mouseleave", hideTip);
+    el.addEventListener("focus", function () {
+      var r = el.getBoundingClientRect();
+      showTip(html, r.left + r.width / 2, r.top);
+    });
+    el.addEventListener("blur", hideTip);
+  }
+
+  /* ---------- chart builders ---------- */
+  function tally(rows, get) {
+    var m = new Map();
+    for (var i = 0; i < rows.length; i++) {
+      var v = get(rows[i]);
+      if (v == null) continue;
+      if (Array.isArray(v)) {
+        for (var j = 0; j < v.length; j++) {
+          if (v[j]) m.set(v[j], (m.get(v[j]) || 0) + 1);
+        }
+      } else if (v !== "") m.set(v, (m.get(v) || 0) + 1);
+    }
+    return Array.from(m, function (e) { return { k: e[0], n: e[1] }; })
+      .sort(function (a, b) { return b.n - a.n || (a.k < b.k ? -1 : 1); });
+  }
+
+  /* Per-panel disclosure state: how many rows are revealed, and any
+     search term typed into that panel's own box. Keyed by panel id so it
+     survives re-renders driven by the global filters. */
+  var moreState = Object.create(null);
+  var panelRender = Object.create(null);
+
+  function barList(host, allItems, opts) {
+    var key = opts.key || host.id;
+    var base = opts.limit || 10;
+    var st = moreState[key] || (moreState[key] = { n: base, q: "" });
+    panelRender[key] = function () { barList(host, allItems, opts); };
+
+    host.innerHTML = "";
+    if (!allItems.length) {
+      host.innerHTML = '<p class="empty">Nothing matches the current filters.</p>'; return;
+    }
+    var gmax = allItems[0].n;            /* bars stay on one scale as rows reveal */
+    var items = allItems;
+    if (st.q) {
+      var qq = st.q.toLowerCase();
+      items = allItems.filter(function (i) { return i.k.toLowerCase().indexOf(qq) >= 0; });
+    }
+    var shown = items.slice(0, st.n);
+    /* an active filter must stay visible even when it sits past the cut */
+    if (opts.active && !shown.some(function (i) { return i.k === opts.active; })) {
+      var hit = items.filter(function (i) { return i.k === opts.active; })[0];
+      if (hit) shown = [hit].concat(shown.slice(0, Math.max(0, st.n - 1)));
+    }
+
+    /* Search box where the list is too long to just reveal and scan — and
+       always while a term is active, or a filter would stay applied with no
+       visible control to clear it. */
+    if (allItems.length > 40 || st.q) {
+      var sb = document.createElement("div");
+      sb.className = "moresearch";
+      sb.innerHTML = '<input type="search" id="q-' + key + '" value="' + esc(st.q) +
+        '" placeholder="Search these ' + num(allItems.length) + ' …" autocomplete="off">';
+      host.appendChild(sb);
+      var inp = sb.firstChild;
+      inp.addEventListener("input", function () {
+        var caret = inp.selectionStart;
+        st.q = inp.value.trim();
+        st.n = base;
+        panelRender[key]();
+        var again = document.getElementById("q-" + key);
+        if (again) { again.focus(); try { again.setSelectionRange(caret, caret); } catch (e) {} }
+      });
+    }
+
+    if (!shown.length) {
+      var none = document.createElement("p");
+      none.className = "empty";
+      none.style.padding = "18px 8px";
+      none.textContent = 'Nothing here matches "' + st.q + '".';
+      host.appendChild(none);
+    }
+
+    var wrap = document.createElement("div");
+    wrap.className = "bars" + (st.n > base ? " scroller" : "");
+    var max = gmax;
+    shown.forEach(function (it) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "bar";
+      b.setAttribute("aria-pressed", String(opts.active === it.k));
+      b.innerHTML =
+        '<span class="bar-l"><span class="bar-t">' + esc(it.k) + '</span>' +
+        '<span class="bar-track" style="width:100%"><span class="bar-fill" style="width:' +
+        (it.n / max * 100).toFixed(2) + '%;background:var(' + (opts.color || "--s1") + ');display:block"></span></span></span>' +
+        '<span class="bar-v">' + num(it.n) + "</span>";
+      bindTip(b, "<b>" + esc(it.k) + "</b>" + '<span class="num">' + num(it.n) + "</span> " +
+        (it.n === 1 ? "work" : "works") + " &middot; " +
+        '<span class="num">' + (it.n / opts.total * 100).toFixed(1) + "%</span> of selection" +
+        (opts.hint ? '<br><span style="color:var(--muted)">' + opts.hint + "</span>" : ""));
+      b.addEventListener("click", function () { opts.onpick(it.k); });
+      wrap.appendChild(b);
+    });
+    host.appendChild(wrap);
+
+    /* ---- reveal controls ---- */
+    var remaining = items.length - shown.length;
+    if (remaining > 0 || st.n > base) {
+      var foot = document.createElement("div");
+      foot.className = "morefoot";
+      var count = document.createElement("span");
+      count.className = "morecount";
+      count.textContent = num(shown.length) + " of " + num(items.length) +
+        (st.q ? " matching" : "");
+      foot.appendChild(count);
+
+      if (remaining > 0) {
+        var stepN = Math.min(40, remaining);
+        var more = document.createElement("button");
+        more.type = "button";
+        more.className = "morebtn";
+        more.textContent = "Show " + num(stepN) + " more";
+        more.addEventListener("click", function () { st.n += stepN; panelRender[key](); });
+        foot.appendChild(more);
+
+        if (remaining > stepN && items.length <= 400) {
+          var all = document.createElement("button");
+          all.type = "button";
+          all.className = "morebtn";
+          all.textContent = "Show all " + num(items.length);
+          all.addEventListener("click", function () { st.n = items.length; panelRender[key](); });
+          foot.appendChild(all);
+        }
+      }
+      if (st.n > base) {
+        var less = document.createElement("button");
+        less.type = "button";
+        less.className = "morebtn ghost";
+        less.textContent = "Collapse";
+        less.addEventListener("click", function () {
+          st.n = base; panelRender[key]();
+          host.scrollIntoView({ block: "nearest" });
+        });
+        foot.appendChild(less);
+      }
+      host.appendChild(foot);
+    }
+  }
+
+  /* column chart — publications by year */
+  function colChart(host, series, opts) {
+    var Wd = 660, Ht = 216, L = 40, R = 8, Tp = 14, B = 26;
+    var iw = Wd - L - R, ih = Ht - Tp - B;
+    var max = Math.max.apply(null, series.map(function (d) { return d.v; })) || 1;
+    var step = niceStep(max), top = Math.ceil(max / step) * step;
+    var bw = iw / series.length, pad = Math.min(9, bw * .22);
+    var s = ['<svg class="chart" viewBox="0 0 ' + Wd + " " + Ht + '" role="img" aria-label="' + opts.aria + '">'];
+    for (var t = 0; t <= top; t += step) {
+      var gy = (Tp + ih - t / top * ih).toFixed(1);
+      s.push('<line class="' + (t === 0 ? "baseline" : "gridline") + '" x1="' + L + '" x2="' + (Wd - R) + '" y1="' + gy + '" y2="' + gy + '"/>');
+      s.push('<text x="' + (L - 7) + '" y="' + gy + '" text-anchor="end" dominant-baseline="middle">' + num(t) + "</text>");
+    }
+    series.forEach(function (d, i) {
+      var h = d.v / top * ih, x = L + i * bw + pad, w = Math.max(2, bw - pad * 2);
+      var y = Tp + ih - h;
+      s.push('<g class="col" tabindex="0" role="button" aria-pressed="' + String(!!d.on) + '" data-k="' + d.k + '">');
+      s.push('<rect class="hit" x="' + (L + i * bw) + '" y="' + Tp + '" width="' + bw + '" height="' + ih + '"/>');
+      s.push('<rect class="mark" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) +
+        '" height="' + Math.max(h, 1).toFixed(1) + '" rx="3" fill="var(' + (d.on ? "--brand" : opts.color) + ')"/>');
+      s.push('<text class="' + (d.on ? "axl" : "") + '" x="' + (L + i * bw + bw / 2).toFixed(1) + '" y="' + (Ht - 9) + '" text-anchor="middle">' + d.lab + "</text>");
+      s.push("</g>");
+    });
+    s.push("</svg>");
+    host.innerHTML = s.join("");
+    /* one .col group per series item, emitted in order — index maps directly */
+    Array.prototype.forEach.call(host.querySelectorAll(".col"), function (g, idx) {
+      var d = series[idx];
+      bindTip(g, opts.tip(d));
+      g.addEventListener("click", function () { opts.onpick(d); });
+      g.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); opts.onpick(d); }
+      });
+    });
+  }
+
+  function niceStep(max) {
+    var raw = max / 4, mag = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+    var n = raw / mag;
+    return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * mag;
+  }
+
+  /* line + area — mean FWCI by year */
+  function lineChart(host, series, opts) {
+    var Wd = 660, Ht = 216, L = 40, R = 10, Tp = 14, B = 26;
+    var iw = Wd - L - R, ih = Ht - Tp - B;
+    var vals = series.filter(function (d) { return d.v != null; });
+    var hi = Math.max.apply(null, vals.map(function (d) { return d.v; }).concat([opts.ref * 1.25]));
+    var step = niceStep(hi), top = Math.ceil(hi / step) * step || 1;
+    var x = function (i) { return L + (series.length === 1 ? iw / 2 : i / (series.length - 1) * iw); };
+    var y = function (v) { return Tp + ih - v / top * ih; };
+    var s = ['<svg class="chart" viewBox="0 0 ' + Wd + " " + Ht + '" role="img" aria-label="' + opts.aria + '">'];
+    for (var t = 0; t <= top + 1e-9; t += step) {
+      var gy = y(t).toFixed(1);
+      s.push('<line class="' + (t === 0 ? "baseline" : "gridline") + '" x1="' + L + '" x2="' + (Wd - R) + '" y1="' + gy + '" y2="' + gy + '"/>');
+      s.push('<text x="' + (L - 7) + '" y="' + gy + '" text-anchor="end" dominant-baseline="middle">' + t.toFixed(step < 1 ? 1 : 0) + "</text>");
+    }
+    if (!vals.length) {
+      s.push('<text x="' + (L + iw / 2) + '" y="' + (Tp + ih / 2) + '" text-anchor="middle" class="axl">No FWCI available for this selection</text></svg>');
+      host.innerHTML = s.join(""); return;
+    }
+    var pts = [], area = [];
+    series.forEach(function (d, i) {
+      if (d.v == null) return;
+      pts.push(x(i).toFixed(1) + "," + y(d.v).toFixed(1));
+    });
+    area = pts.slice();
+    var firstI = series.findIndex(function (d) { return d.v != null; });
+    var lastI = series.length - 1 - series.slice().reverse().findIndex(function (d) { return d.v != null; });
+    s.push('<path d="M' + pts.join(" L") + " L" + x(lastI).toFixed(1) + "," + y(0).toFixed(1) +
+      " L" + x(firstI).toFixed(1) + "," + y(0).toFixed(1) + ' Z" fill="var(--s1)" opacity=".1"/>');
+    /* world-average reference, labelled with the value it marks */
+    s.push('<line class="refline" x1="' + L + '" x2="' + (Wd - R) + '" y1="' + y(opts.ref).toFixed(1) + '" y2="' + y(opts.ref).toFixed(1) + '"/>');
+    s.push('<text class="axl" x="' + (Wd - R) + '" y="' + (y(opts.ref) - 5).toFixed(1) + '" text-anchor="end">world average = 1.0</text>');
+    s.push('<path d="M' + pts.join(" L") + '" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/>');
+    series.forEach(function (d, i) {
+      if (d.v == null) return;
+      s.push('<g class="col" tabindex="0" data-i="' + i + '">');
+      s.push('<rect class="hit" x="' + (x(i) - iw / series.length / 2).toFixed(1) + '" y="' + Tp + '" width="' + (iw / series.length).toFixed(1) + '" height="' + ih + '"/>');
+      s.push('<circle cx="' + x(i).toFixed(1) + '" cy="' + y(d.v).toFixed(1) + '" r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>');
+      s.push("</g>");
+    });
+    /* endpoint emphasis + direct label */
+    var last = series[lastI];
+    s.push('<text class="axl" x="' + (x(lastI) - 6).toFixed(1) + '" y="' + (y(last.v) - 9).toFixed(1) +
+      '" text-anchor="end" style="font-weight:600">' + last.v.toFixed(2) + "</text>");
+    series.forEach(function (d, i) {
+      if (i % 2 === 0 || i === series.length - 1) {
+        s.push('<text x="' + x(i).toFixed(1) + '" y="' + (Ht - 9) + '" text-anchor="middle">' + d.lab + "</text>");
+      }
+    });
+    s.push("</svg>");
+    host.innerHTML = s.join("");
+    Array.prototype.forEach.call(host.querySelectorAll(".col"), function (g) {
+      bindTip(g, opts.tip(series[+g.dataset.i]));
+    });
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    var rows = select();
+    renderKpis(rows);
+    renderChips();
+
+    /* year — filtered on everything except year, so the range control stays legible */
+    var byYearAll = select("year");
+    var ymap = new Map();
+    byYearAll.forEach(function (w) { ymap.set(w.y, (ymap.get(w.y) || 0) + 1); });
+    var yser = YEARS.map(function (y) {
+      return {
+        k: y, lab: String(y).slice(2), v: ymap.get(y) || 0,
+        on: S.y0 === y && S.y1 === y
+      };
+    });
+    $("cnt-year").textContent = num(byYearAll.length) + " works";
+    colChart($("ch-year"), yser, {
+      color: "--s1", aria: "Works per year",
+      tip: function (d) {
+        return "<b>" + d.k + (d.k === 2026 ? " (partial)" : "") + "</b>" +
+          '<span class="num">' + num(d.v) + "</span> works" +
+          (d.on ? "<br><span style='color:var(--muted)'>click to clear</span>"
+                : "<br><span style='color:var(--muted)'>click to isolate</span>");
+      },
+      onpick: function (d) {
+        if (S.y0 === d.k && S.y1 === d.k) { S.y0 = META.years[0]; S.y1 = META.years[1]; }
+        else { S.y0 = d.k; S.y1 = d.k; }
+        syncControls(); S.page = 1; render();
+      }
+    });
+
+    /* fwci by year */
+    var fmap = new Map();
+    rows.forEach(function (w) {
+      if (w.f == null) return;
+      var e = fmap.get(w.y) || { s: 0, n: 0 }; e.s += w.f; e.n++; fmap.set(w.y, e);
+    });
+    var fser = [], covered = 0, fwtot = 0;
+    for (var yi = S.y0; yi <= S.y1; yi++) {
+      var e = fmap.get(yi);
+      fser.push({ k: yi, lab: String(yi).slice(2), v: e ? e.s / e.n : null, n: e ? e.n : 0 });
+      if (e) { covered += e.n; fwtot += e.s; }
+    }
+    $("cnt-fwci").textContent = covered ? num(covered) + " scored" : "no data";
+    lineChart($("ch-fwci"), fser, {
+      ref: 1, aria: "Mean field-weighted citation impact by year",
+      tip: function (d) {
+        return "<b>" + d.k + "</b>" + '<span class="num">' + d.v.toFixed(2) + "</span> mean FWCI<br>" +
+          '<span style="color:var(--muted)">across <span class="num">' + num(d.n) + "</span> scored works &middot; " +
+          (d.v >= 1 ? (d.v).toFixed(2) + "× the world average" : "below the world average") + "</span>";
+      }
+    });
+
+    /* fields */
+    var byFieldAll = tally(select("field"), function (w) { return w.fld; });
+    $("cnt-field").textContent = num(byFieldAll.length) + " of 26";
+    barList($("ch-field"), byFieldAll, {
+      key: "field", limit: 10,
+      total: select("field").length, color: "--s1", active: S.field,
+      hint: "click to filter · click again to clear",
+      onpick: function (k) { S.field = S.field === k ? "" : k; S.sub = ""; syncControls(); S.page = 1; render(); }
+    });
+
+    /* open access, stacked by year */
+    renderOA(select("oa"));
+
+    /* venues, authors, partners, subfields */
+    var bySrc = tally(rows, function (w) { return w.src; });
+    $("cnt-src").textContent = num(bySrc.length) + " venues";
+    barList($("ch-src"), bySrc, {
+      key: "src", limit: 10,
+      total: rows.length, color: "--s3", active: S.src,
+      onpick: function (k) { S.src = S.src === k ? "" : k; S.page = 1; render(); }
+    });
+
+    var byAuth = tally(rows, function (w) { return w.la; });
+    $("cnt-auth").textContent = num(byAuth.length) + " named";
+    barList($("ch-auth"), byAuth, {
+      key: "auth", limit: 12,
+      total: rows.length, color: "--s2", active: S.auth,
+      hint: "counts works, not authorship share",
+      onpick: function (k) { S.auth = S.auth === k ? "" : k; S.page = 1; render(); }
+    });
+
+    var byInst = tally(rows, function (w) { return w.ci; });
+    $("cnt-inst").textContent = num(byInst.length) + " partners";
+    barList($("ch-inst"), byInst, {
+      key: "inst", limit: 12,
+      total: rows.length, color: "--s5", active: S.inst,
+      onpick: function (k) { S.inst = S.inst === k ? "" : k; S.page = 1; render(); }
+    });
+
+    /* funders — own skip so the list stays navigable while one is selected */
+    var fundRows = select("fund");
+    var byFund = tally(fundRows, function (w) { return w.fund; });
+    $("cnt-fund").textContent = num(byFund.length) + " funders";
+    barList($("ch-fund"), byFund, {
+      key: "fund", limit: 12,
+      total: fundRows.length, color: "--s6", active: S.fund,
+      hint: "45% of works name any funder",
+      onpick: function (k) { S.fund = S.fund === k ? "" : k; syncControls(); S.page = 1; render(); }
+    });
+
+    /* departments — derived; the two audit buckets sort in with everything else */
+    var deptRows = select("dept");
+    var byDept = tally(deptRows, function (w) { return w.dept; });
+    var named = byDept.filter(function (d) {
+      return d.k !== META.not_stated && d.k !== META.college_level;
+    });
+    $("cnt-dept").textContent = num(named.length) + " units";
+    barList($("ch-dept"), byDept, {
+      key: "dept", limit: 12,
+      total: deptRows.length, color: "--s2", active: S.dept,
+      hint: "derived from affiliation text, not an OpenAlex field",
+      onpick: function (k) { S.dept = S.dept === k ? "" : k; syncControls(); S.page = 1; render(); }
+    });
+
+    var bySub = tally(rows, function (w) { return w.sub; });
+    $("cnt-sub").textContent = num(bySub.length) + " subfields";
+    barList($("ch-sub"), bySub, {
+      key: "sub", limit: 12,
+      total: rows.length, color: "--s4", active: S.sub,
+      onpick: function (k) { S.sub = S.sub === k ? "" : k; S.page = 1; render(); }
+    });
+
+    renderPub(select("pub"));
+    renderRise(rows);
+    renderSdg(select("sdg"));
+    renderTable(rows);
+  }
+
+  /* ---------- publishers: stacked by OA route, parent rows expandable ---------- */
+  function renderPub(rows) {
+    var host = $("ch-pub");
+    var byParent = new Map();
+    rows.forEach(function (w) {
+      var key = S.pubmode === "imprint" ? (w.imp || w.pub) : w.pub;
+      var e = byParent.get(key);
+      if (!e) { e = { k: key, n: 0, oa: new Map(), imps: new Map() }; byParent.set(key, e); }
+      e.n++;
+      e.oa.set(w.oa, (e.oa.get(w.oa) || 0) + 1);
+      var ik = w.imp || w.pub;
+      var ie = e.imps.get(ik);
+      if (!ie) { ie = { k: ik, n: 0, oa: new Map() }; e.imps.set(ik, ie); }
+      ie.n++;
+      ie.oa.set(w.oa, (ie.oa.get(w.oa) || 0) + 1);
+    });
+    var all = Array.from(byParent.values()).sort(function (a, b) { return b.n - a.n; });
+    /* "no publisher" and the repository bucket are context, not competitors: they
+       sit below a divider so neither tops the ranking nor sets the bar scale. */
+    var SPECIAL = [META.pub_none, META.pub_repo];
+    var list = all.filter(function (p) { return SPECIAL.indexOf(p.k) < 0; });
+    var special = SPECIAL.map(function (k) {
+      return all.filter(function (p) { return p.k === k; })[0];
+    }).filter(Boolean);
+    $("cnt-pub").textContent = num(list.length) +
+      (S.pubmode === "imprint" ? " imprints" : " publishers");
+    if (!list.length && !special.length) {
+      host.innerHTML = '<p class="empty">Nothing matches the current filters.</p>'; return;
+    }
+    var pst = moreState["pub"] || (moreState["pub"] = { n: 12, q: "" });
+    panelRender["pub"] = function () { renderPub(rows); };
+    var full = list;
+    if (pst.q) {
+      var pq = pst.q.toLowerCase();
+      list = list.filter(function (p) { return p.k.toLowerCase().indexOf(pq) >= 0; });
+    }
+    var max = (full[0] ? full[0].n : 1);   /* one scale, regardless of what is revealed */
+    var top = list.slice(0, pst.n);
+
+    function track(oaMap, total) {
+      var s = '<span class="pubtrack">';
+      OA_ORDER.concat(["unknown"]).forEach(function (k) {
+        var v = oaMap.get(k) || 0;
+        if (!v) return;
+        s += '<span class="pubseg" style="flex-grow:' + v + ';background:var(' + OA_META[k].v +
+          ')" data-oa="' + k + '" data-v="' + v + '" data-t="' + total + '"></span>';
+      });
+      /* the bar is a share of the biggest publisher, so short bars stay comparable */
+      s += '<span style="flex-grow:' + Math.max(0, max - total) + '"></span></span>';
+      return s;
+    }
+
+    var out = [];
+    top.concat(special.length ? [null] : []).concat(special).forEach(function (p) {
+      if (p === null) {
+        out.push('<div class="slopesplit" style="margin:12px 0 6px">Not ranked above</div>');
+        return;
+      }
+      var many = S.pubmode === "parent" && p.imps.size > 1;
+      var open = !!expanded[p.k];
+      var on = (S.pub === p.k || S.imp === p.k) ? "1" : "0";
+      out.push('<div class="pubrow" data-on="' + on + '">' +
+        (many ? '<button class="disc" type="button" data-disc="' + esc(p.k) + '" aria-expanded="' +
+                open + '" aria-label="Show imprints of ' + esc(p.k) + '">' + (open ? "▾" : "▸") + "</button>"
+              : '<span class="disc"></span>') +
+        '<button class="pubname" type="button" data-pick="' + esc(p.k) + '">' + esc(p.k) + "</button>" +
+        track(p.oa, p.n) +
+        '<span class="pubtot">' + num(p.n) + "</span></div>");
+      if (many && open) {
+        Array.from(p.imps.values()).sort(function (a, b) { return b.n - a.n; })
+          .forEach(function (im) {
+            out.push('<div class="pubrow sub" data-on="' + (S.imp === im.k ? "1" : "0") + '">' +
+              '<span class="disc"></span>' +
+              '<button class="pubname" type="button" data-pickimp="' + esc(im.k) + '">' +
+              esc(im.k) + "</button>" + track(im.oa, im.n) +
+              '<span class="pubtot">' + num(im.n) + "</span></div>");
+          });
+      }
+    });
+    var prem = list.length - top.length;
+    var pfoot = '<div class="morefoot"><span class="morecount">' + num(top.length) + " of " +
+      num(list.length) + (pst.q ? " matching" : "") + "</span>";
+    if (prem > 0) {
+      pfoot += '<button class="morebtn" type="button" data-pmore="' + Math.min(40, prem) +
+        '">Show ' + num(Math.min(40, prem)) + " more</button>";
+    }
+    if (pst.n > 12) pfoot += '<button class="morebtn ghost" type="button" data-pless="1">Collapse</button>';
+    pfoot += "</div>";
+    host.innerHTML =
+      (full.length > 40 || pst.q
+        ? '<div class="moresearch"><input type="search" id="q-pub" value="' + esc(pst.q) +
+          '" placeholder="Search these ' + num(full.length) + ' …" autocomplete="off"></div>'
+        : "") +
+      out.join("") +
+      (top.length ? "" : '<p class="empty" style="padding:18px 8px">Nothing here matches "' +
+        esc(pst.q) + '".</p>') +
+      pfoot + oaLegendHtml(rows.length);
+
+    var pinp = $("q-pub");
+    if (pinp) {
+      pinp.addEventListener("input", function () {
+        var caret = pinp.selectionStart;
+        pst.q = pinp.value.trim(); pst.n = 12;
+        panelRender["pub"]();
+        var again = $("q-pub");
+        if (again) { again.focus(); try { again.setSelectionRange(caret, caret); } catch (e) {} }
+      });
+    }
+    Array.prototype.forEach.call(host.querySelectorAll("[data-pmore]"), function (b) {
+      b.addEventListener("click", function () { pst.n += +b.dataset.pmore; panelRender["pub"](); });
+    });
+    Array.prototype.forEach.call(host.querySelectorAll("[data-pless]"), function (b) {
+      b.addEventListener("click", function () { pst.n = 12; panelRender["pub"](); });
+    });
+
+    Array.prototype.forEach.call(host.querySelectorAll(".disc[data-disc]"), function (b) {
+      b.addEventListener("click", function () {
+        var k = b.dataset.disc;
+        if (expanded[k]) delete expanded[k]; else expanded[k] = 1;
+        render();
+      });
+    });
+    Array.prototype.forEach.call(host.querySelectorAll(".pubname[data-pick]"), function (b) {
+      var k = b.dataset.pick;
+      b.addEventListener("click", function () {
+        S.imp = "";
+        S.pub = S.pub === k ? "" : k;
+        S.page = 1; render();
+      });
+    });
+    Array.prototype.forEach.call(host.querySelectorAll(".pubname[data-pickimp]"), function (b) {
+      var k = b.dataset.pickimp;
+      b.addEventListener("click", function () {
+        S.imp = S.imp === k ? "" : k;
+        S.page = 1; render();
+      });
+    });
+    Array.prototype.forEach.call(host.querySelectorAll(".pubseg"), function (el) {
+      var k = el.dataset.oa, v = +el.dataset.v, t = +el.dataset.t;
+      bindTip(el, "<b>" + OA_META[k].label + "</b>" +
+        '<span class="num">' + num(v) + "</span> of <span class=\"num\">" + num(t) +
+        '</span> works &middot; <span class="num">' + (v / t * 100).toFixed(0) + "%</span><br>" +
+        '<span style="color:var(--muted)">' + OA_META[k].note + "</span>");
+    });
+  }
+
+  function oaLegendHtml(total) {
+    var s = '<div class="legend">';
+    OA_ORDER.forEach(function (k) {
+      s += '<span class="lgi" style="cursor:default"><span class="sw" style="background:var(' +
+        OA_META[k].v + ')"></span>' + OA_META[k].label + "</span>";
+    });
+    return s + "</div>";
+  }
+
+  /* ---------- rising & falling subfields ---------- */
+  function renderRise(rows) {
+    var P = META.growth_periods, host = $("ch-rise");
+    var m = new Map(), win = [0, 0];
+    rows.forEach(function (w) {
+      var slot = (w.y >= P[0][0] && w.y <= P[0][1]) ? 0
+               : (w.y >= P[1][0] && w.y <= P[1][1]) ? 1 : -1;
+      if (slot < 0) return;                      /* 2026 excluded: partial year */
+      win[slot]++;
+      if (!w.sub) return;
+      var e = m.get(w.sub) || [0, 0];
+      e[slot]++; m.set(w.sub, e);
+    });
+
+    /* A two-window comparison is meaningless when the selection only exists in
+       one window — every subfield would read as rising from zero. The library
+       waiver data (2024 onwards) is exactly that case. */
+    var pa = P[0][0] + "–" + P[0][1], pb = P[1][0] + "–" + P[1][1];
+    if (!win[0] || !win[1]) {
+      var why = S.lw === "yes"
+        ? "The library-supported set begins in " + META.lw.years[0] + ", so it has no works in " +
+          "the " + pa + " window. Comparing two five-year periods would report every subfield " +
+          "as rising from zero, which says nothing about the research."
+        : "This selection has no works in the " + (win[0] ? pb : pa) + " window, so there is " +
+          "nothing to compare it against.";
+      host.innerHTML = '<p class="empty" style="text-align:left;max-width:62ch">' +
+        "<b>Growth comparison not applicable here.</b>" + why +
+        ' <span style="color:var(--muted)">Widen the year range or clear the filter that ' +
+        'restricts the period.</span></p>';
+      $("cnt-rise").textContent = "not applicable";
+      return;
+    }
+    var items = [];
+    m.forEach(function (v, k) {
+      var tot = v[0] + v[1];
+      if (tot < 25) return;                      /* tiny denominators lie */
+      items.push({ k: k, a: v[0], b: v[1], d: v[1] - v[0],
+                   pct: v[0] ? (v[1] - v[0]) / v[0] * 100 : null });
+    });
+    if (!items.length) {
+      host.innerHTML = '<p class="empty">Not enough works in this selection to compare two ' +
+        'five-year windows. Widen the filters.</p>';
+      $("cnt-rise").textContent = "no data";
+      return;
+    }
+    items.sort(function (x, y) { return y.d - x.d; });
+    var risers = items.slice(0, 8).filter(function (i) { return i.d > 0; });
+    var fallers = items.slice(-8).filter(function (i) { return i.d < 0; })
+      .sort(function (x, y) { return x.d - y.d; });
+    $("cnt-rise").textContent = num(items.length) + " subfields compared";
+    var max = Math.max.apply(null, items.map(function (i) { return Math.max(i.a, i.b); })) || 1;
+
+    function rowsHtml(arr) {
+      return arr.map(function (i) {
+        var x1 = i.a / max * 100, x2 = i.b / max * 100;
+        var cls = i.d > 0 ? "up" : "down";
+        var col = i.d > 0 ? "var(--up)" : "var(--down)";
+        var lo = Math.min(x1, x2), hi = Math.max(x1, x2);
+        return '<button class="sloperow" type="button" data-k="' + esc(i.k) + '" aria-pressed="' +
+          String(S.sub === i.k) + '">' +
+          '<span class="slopename">' + esc(i.k) + "</span>" +
+          '<span class="slopetrack">' +
+            '<span class="slopeline" style="left:' + lo + "%;width:" + (hi - lo) +
+              "%;background:" + col + '"></span>' +
+            '<span class="slopedot from" style="left:' + x1 + '%"></span>' +
+            '<span class="slopedot" style="left:' + x2 + "%;background:" + col + '"></span>' +
+          "</span>" +
+          '<span class="slopedelta ' + cls + '">' + (i.d > 0 ? "+" : "") + num(i.d) +
+          (i.pct == null ? "" : " <span style=\"opacity:.65\">" +
+            (i.pct > 0 ? "+" : "") + Math.round(i.pct) + "%</span>") + "</span>" +
+          "</button>";
+      }).join("");
+    }
+
+    host.innerHTML =
+      '<div class="slopehead"><span>Subfield</span><span>' + pa +
+        '  <span style="float:right">' + pb + "</span></span><span>Change</span></div>" +
+      '<div class="slope">' + rowsHtml(risers) + "</div>" +
+      (fallers.length ? '<div class="slopesplit">Declining</div><div class="slope">' +
+        rowsHtml(fallers) + "</div>" : "");
+
+    Array.prototype.forEach.call(host.querySelectorAll(".sloperow"), function (b, ix) {
+      var all = risers.concat(fallers), i = all[ix];
+      bindTip(b, "<b>" + esc(i.k) + "</b>" +
+        pa + ': <span class="num">' + num(i.a) + "</span> works<br>" +
+        pb + ': <span class="num">' + num(i.b) + "</span> works<br>" +
+        '<span style="color:var(--muted)">' + (i.d > 0 ? "up " : "down ") + num(Math.abs(i.d)) +
+        (i.pct == null ? "" : " (" + Math.abs(Math.round(i.pct)) + "%)") + "</span>");
+      b.addEventListener("click", function () {
+        S.sub = S.sub === i.k ? "" : i.k; S.page = 1; render();
+      });
+    });
+  }
+
+  /* ---------- SDG: polar wheel plus an honest ranked list ---------- */
+  function renderSdg(rows) {
+    var counts = new Map(), tagged = 0;
+    rows.forEach(function (w) {
+      if (w.sdg.length) tagged++;
+      w.sdg.forEach(function (n) { counts.set(n, (counts.get(n) || 0) + 1); });
+    });
+    $("cnt-sdg").textContent = tagged
+      ? num(tagged) + " works tagged (" + (tagged / Math.max(rows.length, 1) * 100).toFixed(0) + "%)"
+      : "no data";
+    var wheel = $("ch-sdg-wheel"), listEl = $("ch-sdg-list");
+    if (!tagged) {
+      wheel.innerHTML = '<p class="empty">No goal-tagged works in this selection.</p>';
+      listEl.innerHTML = "";
+      return;
+    }
+    var max = Math.max.apply(null, SDG.map(function (s) { return counts.get(s[0]) || 0; })) || 1;
+    var step = niceStep(max), top = Math.ceil(max / step) * step;
+
+    var C = 230, R0 = 62, R1 = 186, GAP = 1.6;
+    var seg = 360 / SDG.length;
+    function pol(r, deg) {
+      var a = (deg - 90) * Math.PI / 180;
+      return [C + r * Math.cos(a), C + r * Math.sin(a)];
+    }
+    function wedgePath(r, a0, a1) {
+      var p0 = pol(R0, a0), p1 = pol(r, a0), p2 = pol(r, a1), p3 = pol(R0, a1);
+      var laf = (a1 - a0) > 180 ? 1 : 0;
+      return "M" + p0[0].toFixed(1) + "," + p0[1].toFixed(1) +
+             "L" + p1[0].toFixed(1) + "," + p1[1].toFixed(1) +
+             "A" + r + "," + r + " 0 " + laf + " 1 " + p2[0].toFixed(1) + "," + p2[1].toFixed(1) +
+             "L" + p3[0].toFixed(1) + "," + p3[1].toFixed(1) +
+             "A" + R0 + "," + R0 + " 0 " + laf + " 0 " + p0[0].toFixed(1) + "," + p0[1].toFixed(1) + "Z";
+    }
+
+    var s = ['<svg class="wheel" viewBox="0 0 460 460" role="img" aria-label="Works per UN ' +
+             'Sustainable Development Goal">'];
+    /* value rings, each labelled with the count it marks */
+    for (var t = step; t <= top + 1e-9; t += step) {
+      var rr = R0 + (t / top) * (R1 - R0);
+      s.push('<circle class="wheelring" cx="' + C + '" cy="' + C + '" r="' + rr.toFixed(1) + '"/>');
+      s.push('<text x="' + (C + 3) + '" y="' + (C - rr + 9).toFixed(1) +
+             '" font-size="8.5" text-anchor="start">' + num(t) + "</text>");
+    }
+    SDG.forEach(function (g, i) {
+      var n = counts.get(g[0]) || 0;
+      var a0 = i * seg + GAP / 2, a1 = (i + 1) * seg - GAP / 2;
+      var r = R0 + (n / top) * (R1 - R0);
+      var mid = (a0 + a1) / 2;
+      var lp = pol(R1 + 15, mid);
+      s.push('<g class="wedge" tabindex="0" role="button" data-n="' + g[0] +
+             '" aria-pressed="' + String(S.sdg === g[0]) + '">');
+      s.push('<path d="' + wedgePath(Math.max(r, R0 + 1), a0, a1) + '" fill="' + g[2] +
+             '" stroke="var(--surface)" stroke-width="1"/>');
+      s.push('<text x="' + lp[0].toFixed(1) + '" y="' + lp[1].toFixed(1) +
+             '" font-size="9.5" font-weight="600" text-anchor="middle" dominant-baseline="middle" ' +
+             'fill="' + (S.sdg === g[0] ? "var(--ink)" : "var(--muted)") + '">' + g[0] + "</text>");
+      s.push("</g>");
+    });
+    s.push('<text class="wheelcore" x="' + C + '" y="' + (C - 2) +
+           '" text-anchor="middle">' + num(tagged) + "</text>");
+    s.push('<text class="wheelcore-k" x="' + C + '" y="' + (C + 13) +
+           '" text-anchor="middle">TAGGED WORKS</text>');
+    s.push("</svg>");
+    wheel.innerHTML = s.join("");
+
+    var ranked = SDG.map(function (g) {
+      return { n: g[0], name: g[1], c: g[2], v: counts.get(g[0]) || 0 };
+    }).filter(function (g) { return g.v > 0; })
+      .sort(function (a, b) { return b.v - a.v; });
+    listEl.innerHTML = '<div class="sdglist">' + ranked.map(function (g) {
+      return '<button class="sdgrow" type="button" data-n="' + g.n + '" aria-pressed="' +
+        String(S.sdg === g.n) + '">' +
+        '<span class="sdgnum" style="background:' + g.c + '">' + g.n + "</span>" +
+        '<span class="sdgname">' + esc(g.name) + "</span>" +
+        '<span><span class="sdgbar" style="display:block;width:' +
+          Math.max(4, g.v / max * 100).toFixed(1) + "%;background:" + g.c + '"></span></span>' +
+        '<span class="sdgval">' + num(g.v) + "</span></button>";
+    }).join("") + "</div>";
+
+    function pick(n) { S.sdg = S.sdg === n ? 0 : n; S.page = 1; render(); }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-n]"), function (el) {
+      var n = +el.dataset.n, g = SDG_BY_N[n], v = counts.get(n) || 0;
+      if (!g) return;
+      bindTip(el, "<b>SDG " + n + " · " + esc(g.name) + "</b>" +
+        '<span class="num">' + num(v) + "</span> " + (v === 1 ? "work" : "works") +
+        ' &middot; <span class="num">' + (v / Math.max(tagged, 1) * 100).toFixed(1) +
+        "%</span> of tagged<br>" +
+        '<span style="color:var(--muted)">' + (S.sdg === n ? "click to clear" : "click to filter") +
+        "</span>");
+      el.addEventListener("click", function () { pick(n); });
+      el.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(n); }
+      });
+    });
+  }
+
+  function renderKpis(rows) {
+    var cit = 0, fw = 0, fwn = 0, oa = 0, intl = 0, lc = 0, ck = 0, fu = 0;
+    var auth = new Set(), ctry = new Set();
+    rows.forEach(function (w) {
+      cit += w.c;
+      if (w.f != null) { fw += w.f; fwn++; }
+      if (w.oa !== "closed" && w.oa !== "unknown") oa++;
+      if (w.intl) intl++;
+      if (w.co === 1) lc++;
+      if (w.co !== -1) ck++;
+      if (w.fund.length) fu++;
+      w.la.forEach(function (a) { auth.add(a); });
+      w.cc.forEach(function (c) { ctry.add(c); });
+    });
+    var n = rows.length;
+    var tiles = [
+      { k: "Works", v: num(n), n: n === W.length ? "the whole 2016&ndash;2026 corpus"
+          : "<b>" + (n / W.length * 100).toFixed(1) + "%</b> of " + num(W.length) + " total" },
+      { k: "Citations", v: num(cit), n: n ? "<b>" + (cit / n).toFixed(1) + "</b> per work on average" : "&mdash;" },
+      { k: "Mean FWCI", v: fwn ? (fw / fwn).toFixed(2) : "&mdash;",
+        n: fwn ? "<b>" + num(fwn) + "</b> works scored" + (fw / fwn >= 1 ? " &middot; above parity" : " &middot; below parity") : "nothing scored" },
+      { k: "Open access", v: n ? (oa / n * 100).toFixed(0) + "%" : "&mdash;", n: "<b>" + num(oa) + "</b> works with a free version" },
+      { k: "Lehigh authors", v: num(auth.size), n: "distinct names on the byline" },
+      { k: "Countries", v: num(ctry.size), n: "<b>" + num(intl) + "</b> works with an overseas co-author" },
+      { k: "Lehigh corresponding", v: ck ? (lc / ck * 100).toFixed(0) + "%" : "&mdash;",
+        n: ck ? "<b>" + num(lc) + "</b> of " + num(ck) + " works that name one" : "none recorded" },
+      { k: "Funded", v: n ? (fu / n * 100).toFixed(0) + "%" : "&mdash;",
+        n: "<b>" + num(fu) + "</b> works name a funder" }
+    ];
+    $("kpis").innerHTML = tiles.map(function (t) {
+      return '<div class="kpi"><div class="kpi-k">' + t.k + '</div><div class="kpi-v">' + t.v +
+        '</div><div class="kpi-n">' + t.n + "</div></div>";
+    }).join("");
+  }
+
+  function renderOA(rows) {
+    var per = new Map(), tot = new Map(), grand = new Map();
+    rows.forEach(function (w) {
+      if (w.y < S.y0 || w.y > S.y1) return;
+      var key = w.y + "|" + w.oa;
+      per.set(key, (per.get(key) || 0) + 1);
+      tot.set(w.y, (tot.get(w.y) || 0) + 1);
+      grand.set(w.oa, (grand.get(w.oa) || 0) + 1);
+    });
+    var used = OA_ORDER.filter(function (k) { return grand.get(k); });
+    if (grand.get("unknown")) used.push("unknown");
+    var host = $("ch-oa");
+    var all = Array.from(grand.values()).reduce(function (a, b) { return a + b; }, 0);
+    $("cnt-oa").textContent = all ? num(all) + " works" : "no data";
+    if (!all) { host.innerHTML = '<p class="empty">Nothing matches the current filters.</p>'; return; }
+
+    var s = ['<div class="stack">'];
+    for (var y = S.y1; y >= S.y0; y--) {
+      var t = tot.get(y) || 0;
+      s.push('<div class="srow"><span class="yr">' + y + '</span><span class="strack">');
+      if (!t) s.push('<span class="sseg" style="flex-grow:1;background:var(--surface-2)"></span>');
+      used.forEach(function (k) {
+        var v = per.get(y + "|" + k) || 0;
+        if (!v) return;
+        s.push('<span class="sseg" style="flex-grow:' + v + ';background:var(' + OA_META[k].v +
+          ')" data-oa="' + k + '" data-y="' + y + '" data-v="' + v + '" data-t="' + t + '"></span>');
+      });
+      s.push('</span><span class="tot">' + (t ? num(t) : "&mdash;") + "</span></div>");
+    }
+    s.push("</div>");
+    /* the key doubles as the filter control, and carries each route's share */
+    s.push('<div class="legend">');
+    used.forEach(function (k) {
+      var v = grand.get(k) || 0;
+      s.push('<button class="lgi" type="button" data-lg="' + k + '" aria-pressed="' + String(S.oa === k) + '">' +
+        '<span class="sw" style="background:var(' + OA_META[k].v + ')"></span>' + OA_META[k].label +
+        ' <span class="pct">' + (v / all * 100).toFixed(0) + "%</span></button>");
+    });
+    s.push("</div>");
+    host.innerHTML = s.join("");
+
+    Array.prototype.forEach.call(host.querySelectorAll(".sseg[data-oa]"), function (el) {
+      var k = el.dataset.oa, v = +el.dataset.v, t = +el.dataset.t;
+      bindTip(el, "<b>" + el.dataset.y + " &middot; " + OA_META[k].label + "</b>" +
+        '<span class="num">' + num(v) + "</span> of <span class=\"num\">" + num(t) + "</span> works &middot; " +
+        '<span class="num">' + (v / t * 100).toFixed(0) + "%</span><br>" +
+        '<span style="color:var(--muted)">' + OA_META[k].note + "</span>");
+      el.addEventListener("click", function () { S.oa = S.oa === k ? "" : k; S.page = 1; render(); });
+      el.style.cursor = "pointer";
+    });
+    Array.prototype.forEach.call(host.querySelectorAll(".lgi"), function (el) {
+      var k = el.dataset.lg;
+      bindTip(el, "<b>" + OA_META[k].label + "</b>" + OA_META[k].note + "<br>" +
+        '<span style="color:var(--muted)">click to filter</span>');
+      el.addEventListener("click", function () { S.oa = S.oa === k ? "" : k; S.page = 1; render(); });
+    });
+  }
+
+  var PER = 40;
+  function renderTable(rows) {
+    var dir = S.dir;
+    var sorted = rows.slice().sort(function (a, b) {
+      var av, bv;
+      if (S.sort === "cited") { av = a.c; bv = b.c; }
+      else if (S.sort === "fwci") { av = a.f == null ? -1 : a.f; bv = b.f == null ? -1 : b.f; }
+      else { av = a.sk; bv = b.sk; }
+      return (av - bv) * dir || b.sk - a.sk;
+    });
+    var pages = Math.max(1, Math.ceil(sorted.length / PER));
+    if (S.page > pages) S.page = pages;
+    var start = (S.page - 1) * PER, slice = sorted.slice(start, start + PER);
+
+    $("cnt-tbl").textContent = num(rows.length) + (rows.length === 1 ? " work" : " works");
+    Array.prototype.forEach.call(document.querySelectorAll("th.srt"), function (th) {
+      if (th.dataset.s === S.sort) th.setAttribute("aria-sort", dir < 0 ? "descending" : "ascending");
+      else th.removeAttribute("aria-sort");
+      var base = th.textContent.replace(/[↑↓]\s*$/, "").trim();
+      th.innerHTML = esc(base) + (th.dataset.s === S.sort ? ' <span class="ar">' + (dir < 0 ? "↓" : "↑") + "</span>" : "");
+    });
+
+    $("tbody").innerHTML = slice.map(function (w) {
+      var href = w.doi ? "https://doi.org/" + w.doi : "https://openalex.org/W" + w.id;
+      var m = w.d ? +w.d.slice(0, 2) : 0;
+      var oam = OA_META[w.oa] || OA_META.unknown;
+      var auth = w.la.length
+        ? esc(w.la.slice(0, 3).join(", ")) + (w.la.length > 3 ? " <em>+" + (w.la.length - 3) + " more</em>" : "") +
+          (w.na > w.la.length ? ' <em>&middot; ' + num(w.na) + " authors total</em>" : "")
+        : "<em>no Lehigh author named in the record</em>";
+      /* derived unit line — the raw string is exposed on hover so a row can be audited */
+      var named = w.dept.filter(function (d) {
+        return d !== META.not_stated && d !== META.college_level;
+      });
+      var unit = named.length
+        ? '<span class="unit" title="Derived from the affiliation string on this work.">' +
+            esc(named.join(" · ")) + "</span>"
+        : '<span class="unit none"' +
+            (w.bare ? ' title="No unit in the affiliation string: &quot;' + esc(w.bare) + '&quot;"' :
+                      ' title="No affiliation string recorded for a Lehigh author."') +
+            ">unit not stated</span>";
+      /* library APC waiver — institutional fact, so it gets a solid badge */
+      var lwTag = "";
+      if (w.lw) {
+        var d = w.lw;
+        lwTag = '<span class="lwtag" title="APC covered by a read-and-publish agreement&#10;' +
+          "Agreement year: " + d.ay + "&#10;" +
+          (d.oat ? "Route: " + esc(d.oat) + "&#10;" : "") +
+          (d.pub ? "Agreement: " + esc(d.pub) + "&#10;" : "") +
+          (d.lic ? "Licence: " + esc(d.lic) + "&#10;" : "") +
+          (d.apc ? "APC list price: $" + num(d.apc) + "&#10;" : "") +
+          (d.dept ? "Unit: " + esc(d.dept) + (d.coll ? " · " + esc(d.coll) : "") : "") +
+          '">R&amp;P APC</span>';
+      }
+      var corrMark = w.co === 1
+        ? '<span class="corr" title="Corresponding author at Lehigh' +
+            (w.cn.length ? ": " + esc(w.cn.join(", ")) : "") + '">✉</span>'
+        : "";
+      return "<tr>" +
+        '<td class="c-yr">' + w.y + (m ? "<br>" + MONTHS[m] : "") + "</td>" +
+        '<td class="c-ti">' + corrMark + '<a href="' + href + '" target="_blank" rel="noopener">' + esc(w.t) + "</a>" +
+        (w.rt ? ' <span class="retr">RETRACTED</span>' : "") +
+        '<div class="c-au">' + auth + "</div>" +
+        '<div class="c-un">' + lwTag + unit + (w.fund.length
+          ? ' <span class="fu" title="' + esc(w.fund.join(" · ")) +
+            (w.aw.length ? " — awards: " + esc(w.aw.join(", ")) : "") + '">' +
+            esc(w.fund[0]) + (w.fund.length > 1 ? " +" + (w.fund.length - 1) : "") + "</span>"
+          : "") + "</div></td>" +
+        '<td class="c-src">' + (w.src ? esc(w.src) : '<em style="color:var(--muted)">&mdash;</em>') + "</td>" +
+        "<td>" + (w.fld ? esc(w.fld) : "&mdash;") + "</td>" +
+        "<td>" + esc(TYPE_LABEL[w.ty] || w.ty) + "</td>" +
+        '<td><span class="tag"><span class="dot" style="background:var(' + oam.v + ')"></span>' + oam.label + "</span></td>" +
+        '<td class="c-n' + (w.c >= 100 ? " hi" : "") + '">' + num(w.c) + "</td>" +
+        '<td class="c-n' + (w.f != null && w.f >= 1 ? " fwci-w" : "") + '">' + (w.f == null ? "&mdash;" : w.f.toFixed(2)) + "</td>" +
+        '<td class="c-n" style="color:var(--muted)">' + (w.rf || "&mdash;") + "</td>" +
+        "</tr>";
+    }).join("");
+
+    $("tbl-empty").innerHTML = rows.length ? "" :
+      '<p class="empty"><b>No works match these filters.</b>Widen the year range, clear a filter above, or ' +
+      'try a shorter search term.</p>';
+    $("pg-st").textContent = rows.length
+      ? num(start + 1) + "–" + num(Math.min(start + PER, sorted.length)) + " of " + num(sorted.length) +
+        "  ·  page " + S.page + " / " + num(pages)
+      : "";
+    $("pg-prev").disabled = S.page <= 1;
+    $("pg-next").disabled = S.page >= pages;
+    $("pg-prev").style.opacity = S.page <= 1 ? .45 : 1;
+    $("pg-next").style.opacity = S.page >= pages ? .45 : 1;
+  }
+
+  /* ---------- active filter chips ---------- */
+  function renderChips() {
+    var cs = [];
+    if (S.q) cs.push(["Search", '"' + S.q + '"', function () { S.q = ""; }]);
+    if (S.y0 !== META.years[0] || S.y1 !== META.years[1])
+      cs.push(["Years", S.y0 === S.y1 ? String(S.y0) : S.y0 + "–" + S.y1,
+        function () { S.y0 = META.years[0]; S.y1 = META.years[1]; }]);
+    if (S.field) cs.push(["Field", S.field, function () { S.field = ""; }]);
+    if (S.sub) cs.push(["Subfield", S.sub, function () { S.sub = ""; }]);
+    if (S.type) cs.push(["Type", TYPE_LABEL[S.type] || S.type, function () { S.type = ""; }]);
+    if (S.cit) cs.push(["Cited", S.cit + "+", function () { S.cit = 0; }]);
+    if (S.collab !== "any") cs.push(["Co-authorship", S.collab === "intl" ? "International" : "Lehigh only",
+      function () { S.collab = "any"; }]);
+    if (S.oa) cs.push(["Access", (OA_META[S.oa] || {}).label || S.oa, function () { S.oa = ""; }]);
+    if (S.dept) cs.push(["Dept (derived)", S.dept, function () { S.dept = ""; }]);
+    if (S.fund) cs.push(["Funder", S.fund, function () { S.fund = ""; }]);
+    if (S.pub) cs.push(["Publisher", S.pub, function () { S.pub = ""; }]);
+    if (S.imp) cs.push(["Imprint", S.imp, function () { S.imp = ""; }]);
+    if (S.sdg) cs.push(["SDG " + S.sdg, (SDG_BY_N[S.sdg] || {}).name || "",
+      function () { S.sdg = 0; }]);
+    if (S.lw === "yes") cs.push(["Read & publish", "Agreement APCs · 2024–26 only",
+      function () { S.lw = "any"; }]);
+    if (S.corr !== "any") cs.push(["Corresponding",
+      { lehigh: "Lehigh", other: "Elsewhere", none: "Not recorded" }[S.corr],
+      function () { S.corr = "any"; }]);
+    if (S.src) cs.push(["Venue", S.src, function () { S.src = ""; }]);
+    if (S.auth) cs.push(["Author", S.auth, function () { S.auth = ""; }]);
+    if (S.inst) cs.push(["Partner", S.inst, function () { S.inst = ""; }]);
+
+    var bar = $("chipbar");
+    bar.hidden = !cs.length;
+    bar.innerHTML = '<span class="chipbar-k">Active</span>';
+    cs.forEach(function (c) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip";
+      b.innerHTML = "<b>" + c[0] + "</b><span>" + esc(c[1]) + "</span><i>×</i>";
+      b.title = "Remove this filter";
+      b.addEventListener("click", function () { c[2](); syncControls(); S.page = 1; render(); });
+      bar.appendChild(b);
+    });
+    if (cs.length > 1) {
+      var all = document.createElement("button");
+      all.type = "button"; all.className = "btn"; all.textContent = "Clear all";
+      all.style.marginLeft = "4px";
+      all.addEventListener("click", function () {
+        S.q = ""; S.y0 = META.years[0]; S.y1 = META.years[1]; S.field = ""; S.sub = "";
+        S.type = ""; S.cit = 0; S.collab = "any"; S.oa = ""; S.src = ""; S.auth = ""; S.inst = "";
+        S.dept = ""; S.fund = ""; S.corr = "any";
+        S.pub = ""; S.imp = ""; S.sdg = 0; S.lw = "any";
+        syncControls(); S.page = 1; render();
+      });
+      bar.appendChild(all);
+    }
+  }
+
+  /* ---------- controls ---------- */
+  function option(v, label, sel) {
+    return '<option value="' + esc(v) + '"' + (sel ? " selected" : "") + ">" + label + "</option>";
+  }
+  function buildControls() {
+    var fields = tally(W, function (w) { return w.fld; });
+    $("field").innerHTML = option("", "All fields") + fields.map(function (f) {
+      return option(f.k, esc(f.k) + " (" + num(f.n) + ")");
+    }).join("");
+    var types = tally(W, function (w) { return w.ty; });
+    $("type").innerHTML = option("", "All types") + types.map(function (t) {
+      return option(t.k, esc(TYPE_LABEL[t.k] || t.k) + " (" + num(t.n) + ")");
+    }).join("");
+    var ys = YEARS.map(function (y) { return option(y, y); }).join("");
+    $("y0").innerHTML = ys; $("y1").innerHTML = ys;
+    var depts = tally(W, function (w) { return w.dept; });
+    $("dept").innerHTML = option("", "All departments") + depts.map(function (d) {
+      return option(d.k, esc(d.k) + " (" + num(d.n) + ")");
+    }).join("");
+    var funds = tally(W, function (w) { return w.fund; });
+    $("fund").innerHTML = option("", "All funders") + funds.map(function (f) {
+      return option(f.k, esc(f.k) + " (" + num(f.n) + ")");
+    }).join("");
+    $("mast-fetched").textContent = "snapshot " + META.fetched;
+    $("foot-fetched").textContent = "retrieved " + META.fetched;
+    $("lbl-fund").textContent = META.fund_coverage + "% coverage";
+    $("lbl-dept").textContent = "derived · " + META.dept_coverage + "%";
+    $("lbl-corr").textContent = META.corr_coverage + "% recorded";
+    if (META.lw) {
+      $("fld-lw").hidden = false;
+      $("lbl-lw").textContent = num(META.lw.n) + " agreement APCs · " +
+        META.lw.years[0] + "–" + String(META.lw.years[META.lw.years.length - 1]).slice(2) + " only";
+      $("foot-lw").hidden = false;
+      $("lw-n").textContent = num(META.lw.n);
+      $("lw-years").textContent = META.lw.years[0] + "–" + META.lw.years[META.lw.years.length - 1];
+      $("lw-rows").textContent = num(META.lw.sheet_rows);
+      $("lw-unmatched").textContent = num(META.lw.unmatched);
+      $("lw-first").textContent = META.lw.years[0];
+    }
+    $("foot-dept").textContent = META.dept_coverage + "%";
+    $("foot-corr").textContent = META.corr_coverage + "%";
+    $("foot-fund").textContent = META.fund_coverage + "%";
+    $("foot-pub").textContent = META.pub_coverage + "%";
+    $("foot-sdg").textContent = META.sdg_coverage + "%";
+  }
+  function syncControls() {
+    $("q").value = S.q;
+    $("field").value = S.field;
+    $("type").value = S.type;
+    $("cit").value = String(S.cit);
+    $("y0").value = String(S.y0);
+    $("y1").value = String(S.y1);
+    $("dept").value = S.dept;
+    $("fund").value = S.fund;
+    Array.prototype.forEach.call($("collab").children, function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.v === S.collab));
+    });
+    Array.prototype.forEach.call($("corr").children, function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.v === S.corr));
+    });
+    Array.prototype.forEach.call($("lw").children, function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.v === S.lw));
+    });
+  }
+
+  var deb;
+  $("q").addEventListener("input", function (e) {
+    clearTimeout(deb);
+    var v = e.target.value.trim().toLowerCase();
+    deb = setTimeout(function () { S.q = v; S.page = 1; render(); }, 160);
+  });
+  $("field").addEventListener("change", function (e) { S.field = e.target.value; S.sub = ""; S.page = 1; render(); });
+  $("type").addEventListener("change", function (e) { S.type = e.target.value; S.page = 1; render(); });
+  $("cit").addEventListener("change", function (e) { S.cit = +e.target.value; S.page = 1; render(); });
+  $("y0").addEventListener("change", function (e) {
+    S.y0 = +e.target.value; if (S.y1 < S.y0) S.y1 = S.y0;
+    syncControls(); S.page = 1; render();
+  });
+  $("y1").addEventListener("change", function (e) {
+    S.y1 = +e.target.value; if (S.y0 > S.y1) S.y0 = S.y1;
+    syncControls(); S.page = 1; render();
+  });
+  $("collab").addEventListener("click", function (e) {
+    var b = e.target.closest(".seg"); if (!b) return;
+    S.collab = b.dataset.v; syncControls(); S.page = 1; render();
+  });
+  $("corr").addEventListener("click", function (e) {
+    var b = e.target.closest(".seg"); if (!b) return;
+    S.corr = b.dataset.v; syncControls(); S.page = 1; render();
+  });
+  $("lw").addEventListener("click", function (e) {
+    var b = e.target.closest(".seg"); if (!b) return;
+    S.lw = b.dataset.v; syncControls(); S.page = 1; render();
+  });
+  $("pubmode").addEventListener("click", function (e) {
+    var b = e.target.closest(".seg"); if (!b) return;
+    S.pubmode = b.dataset.v;
+    /* the two views name different things, so a stale pick would filter to nothing */
+    S.pub = ""; S.imp = "";
+    expanded = Object.create(null);
+    Array.prototype.forEach.call($("pubmode").children, function (x) {
+      x.setAttribute("aria-pressed", String(x.dataset.v === S.pubmode));
+    });
+    S.page = 1; render();
+  });
+  $("dept").addEventListener("change", function (e) { S.dept = e.target.value; S.page = 1; render(); });
+  $("fund").addEventListener("change", function (e) { S.fund = e.target.value; S.page = 1; render(); });
+  document.querySelector("thead").addEventListener("click", function (e) {
+    var th = e.target.closest("th.srt"); if (!th) return;
+    if (S.sort === th.dataset.s) S.dir = -S.dir;
+    else { S.sort = th.dataset.s; S.dir = -1; }
+    S.page = 1; render();
+  });
+  $("pg-prev").addEventListener("click", function () { if (S.page > 1) { S.page--; render(); scrollTbl(); } });
+  $("pg-next").addEventListener("click", function () { S.page++; render(); scrollTbl(); });
+  function scrollTbl() {
+    var t = document.getElementById("tbl");
+    window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 120, behavior: "smooth" });
+  }
+  $("theme").addEventListener("click", function () {
+    var r = document.documentElement, cur = r.getAttribute("data-theme");
+    if (!cur) cur = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    r.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+    render();
+  });
+  window.addEventListener("scroll", hideTip, { passive: true });
+
+  buildControls();
+  syncControls();
+  render();
+})();
+</script>
