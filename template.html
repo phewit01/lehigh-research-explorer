@@ -128,8 +128,10 @@ h1 .thin { color: var(--brand); }
 .kpi-n b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* ---------- filter rail ---------- */
+/* Deliberately NOT sticky: the nav strip carries the persistent state, and
+   keeping 209px of controls pinned cost a quarter of the viewport. */
 .rail {
-  position: sticky; top: 0; z-index: 30; margin: 22px 0 0;
+  margin: 22px 0 0; scroll-margin-top: 52px;
   background: var(--surface); border: 1px solid var(--rule); box-shadow: var(--shadow);
 }
 .rail-row {
@@ -426,13 +428,47 @@ input[type="search"]:focus-visible, select:focus-visible, button:focus-visible, 
 .tip .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
 
 /* ---------- table ---------- */
-.tblwrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-thead th {
-  position: sticky; top: 0; background: var(--surface); text-align: left; white-space: nowrap;
-  font: 500 9.5px var(--f-mono); letter-spacing: .09em; text-transform: uppercase; color: var(--muted);
-  border-bottom: 1px solid var(--ink); padding: 7px 9px 7px 0; z-index: 2;
+/* The wrapper scrolls in BOTH directions. overflow-x alone made it the scroll
+   container, which silently broke `position: sticky` on the header — the rows
+   had nothing to stick to and scrolled away with the page. Giving it a height
+   makes the header and filter row stay put while the results scroll under them. */
+.tblwrap {
+  overflow: auto; margin: 0 -16px; padding: 0 16px;
+  max-height: min(74vh, 780px); overscroll-behavior: contain;
+  --h-sort: 28px; --h-lab: 26px;        /* measured at runtime */
 }
+table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12.5px; }
+thead th {
+  position: sticky; background: var(--surface); text-align: left; white-space: nowrap;
+  font: 500 9.5px var(--f-mono); letter-spacing: .09em; text-transform: uppercase; color: var(--muted);
+  padding: 7px 9px 7px 0; z-index: 3;
+}
+thead tr:first-child th { top: 0; box-shadow: inset 0 -1px 0 var(--ink); }
+/* the label strip names the row beneath it, and carries the clear control */
+.filtlabel th {
+  top: var(--h-sort); z-index: 4; padding: 0 0 0 0;
+  background: var(--surface-2); box-shadow: inset 0 -1px 0 var(--rule);
+}
+.filtlabel th > * { vertical-align: middle; }
+.fl-k {
+  display: inline-block; font: 600 9px var(--f-mono); letter-spacing: .12em;
+  text-transform: uppercase; color: var(--on-brand); background: var(--brand);
+  padding: 3px 7px; margin: 4px 8px 4px 0;
+}
+.fl-hint {
+  font: 400 10.5px var(--f-body); letter-spacing: 0; text-transform: none;
+  color: var(--muted); white-space: normal;
+}
+.fl-hint b { color: var(--ink-2); font-family: var(--f-mono); }
+.fl-clear {
+  float: right; margin: 3px 0; font: 500 10.5px var(--f-body); letter-spacing: 0;
+  text-transform: none; color: var(--brand); background: var(--brand-wash);
+  border: 1px solid color-mix(in oklab, var(--brand) 26%, transparent);
+  border-radius: 2px; padding: 3px 8px; cursor: pointer;
+}
+.fl-clear:hover:not(:disabled) { background: var(--brand); color: var(--on-brand); }
+.fl-clear:disabled { opacity: .4; cursor: default; color: var(--muted);
+  background: none; border-color: var(--rule); }
 thead th.srt { cursor: pointer; }
 thead th.srt:hover { color: var(--brand); }
 thead th[aria-sort] { color: var(--ink); }
@@ -462,7 +498,30 @@ footer #foot-lw { flex: 1 1 100%; }
 .corr {
   color: var(--s6); font-size: 12px; margin-right: 4px; cursor: help; vertical-align: 1px;
 }
-.c-src { max-width: 200px; font-size: 11.5px; color: var(--ink-2); }
+.c-src { max-width: 190px; font-size: 11.5px; color: var(--ink-2); }
+.c-pub { max-width: 150px; font-size: 11.5px; color: var(--ink-2); }
+.c-imp { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+.drvmark {
+  display: inline-block; font: 500 8.5px var(--f-mono); letter-spacing: .06em;
+  text-transform: uppercase; color: var(--brand); border: 1px dotted currentColor;
+  border-radius: 2px; padding: 0 3px; cursor: help; vertical-align: 1px;
+}
+
+/* per-column filter row — tinted so it never reads as data */
+.filtrow th {
+  top: calc(var(--h-sort) + var(--h-lab)); z-index: 3;
+  background: var(--surface-2); box-shadow: inset 0 -1px 0 var(--ink);
+  padding: 5px 6px 6px 0;
+}
+.filtrow input[type="search"], .filtrow select {
+  font: 400 11px var(--f-body); padding: 3px 5px; border-radius: 2px;
+  background: var(--surface-2); border: 1px solid var(--rule); width: 100%;
+  min-width: 54px; color: var(--ink);
+}
+.filtrow input::placeholder { color: var(--muted); font-size: 10.5px; }
+.filtrow input:not(:placeholder-shown), .filtrow select:valid:not([value=""]) {
+  border-color: var(--brand);
+}
 .c-n { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .c-n.hi { font-weight: 600; }
 .tag {
@@ -477,15 +536,80 @@ footer #foot-lw { flex: 1 1 100%; }
 .empty { padding: 34px 8px; text-align: center; color: var(--muted); font-size: 13px; }
 .empty b { display: block; font: 600 15px var(--f-display); color: var(--ink); margin-bottom: 6px; }
 
-footer {
-  margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--rule);
-  display: flex; flex-wrap: wrap; gap: 16px 32px; font-size: 11.5px; color: var(--muted);
+/* ---------- notes ---------- */
+/* Ragged flex columns of wildly different lengths read as clutter. A grid of
+   equal tracks, each note the same shape — label, one-line takeaway, detail —
+   lets this be scanned instead of waded through. */
+footer { margin-top: 8px; }
+.notegrid {
+  display: grid; gap: 0 30px; margin-top: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
 }
-footer div { flex: 1 1 260px; }
-footer b { display: block; font: 500 9.5px var(--f-mono); letter-spacing: .11em;
-  text-transform: uppercase; color: var(--ink-2); margin-bottom: 5px; }
-footer a { color: var(--brand); text-decoration: none; }
-footer a:hover { text-decoration: underline; }
+.note {
+  padding: 13px 0 15px; border-top: 1px solid var(--grid);
+  font-size: 11.5px; line-height: 1.55; color: var(--muted);
+}
+.note h3 {
+  font: 500 9.5px var(--f-mono); letter-spacing: .11em; text-transform: uppercase;
+  color: var(--ink-2); margin: 0 0 6px;
+}
+.note .lead { display: block; color: var(--ink); font-weight: 600; margin-bottom: 4px; }
+.note .warn { color: var(--brand); }
+.note p { margin: 0; }
+.note p + p { margin-top: 6px; }
+.note b { color: var(--ink-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.note i { font-style: italic; }
+.note a { color: var(--brand); text-decoration: none; }
+.note a:hover { text-decoration: underline; }
+/* A full-width note would set ~200 characters per line. Flow its body in
+   columns so the measure stays near 65 while the row still fills. */
+.note.wide { grid-column: 1 / -1; columns: 310px auto; column-gap: 30px; }
+.note.wide h3, .note.wide .lead { column-span: all; }
+.note.wide .lead { max-width: 74ch; }
+
+/* ---------- section navigation ---------- */
+/* The page runs to ~10,000px across six sections. A thin persistent strip is
+   the only sticky chrome: it says where you are, how many works are selected,
+   and how many filters are on — so the tall filter rail no longer has to stay
+   on screen to keep that information available. */
+.pagenav {
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule);
+}
+.nav-in {
+  max-width: 1280px; margin: 0 auto; padding: 0 20px;
+  display: flex; align-items: stretch; gap: 2px; overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-in::-webkit-scrollbar { display: none; }
+.nav-in a {
+  display: flex; align-items: center; padding: 0 10px; white-space: nowrap;
+  font: 500 10px var(--f-mono); letter-spacing: .09em; text-transform: uppercase;
+  color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent;
+}
+.nav-in a:hover { color: var(--ink); }
+.nav-in a.active { color: var(--brand); border-bottom-color: var(--brand); }
+.nav-sp { flex: 1 1 auto; min-width: 8px; }
+.nav-stat {
+  display: flex; align-items: center; gap: 5px; padding: 0 2px 0 10px;
+  font: 500 10px var(--f-mono); color: var(--muted); white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.nav-stat b { color: var(--ink); }
+.nav-fbtn {
+  align-self: center; display: inline-flex; align-items: center; gap: 5px;
+  font: 500 10px var(--f-mono); letter-spacing: .07em; text-transform: uppercase;
+  color: var(--muted); background: none; border: 1px solid var(--rule);
+  border-radius: 2px; padding: 3px 7px; margin: 5px 0 5px 10px; cursor: pointer;
+}
+.nav-fbtn:hover { color: var(--brand); border-color: var(--brand); }
+.nav-fbtn[data-on="1"] { color: var(--brand); border-color: var(--brand); background: var(--brand-wash); }
+.nav-fbtn b { font-variant-numeric: tabular-nums; }
+/* anchors must clear the nav strip */
+.secthead, #top { scroll-margin-top: 46px; }
+@media (max-width: 640px) { .nav-in { padding: 0 14px; } }
+.note.wide p { margin: 0 0 6px; break-inside: avoid-column; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 @media (max-width: 640px) {
@@ -495,7 +619,23 @@ footer a:hover { text-decoration: underline; }
 }
 </style>
 
-<div class="wrap">
+<nav class="pagenav" aria-label="Page sections">
+  <div class="nav-in">
+    <a href="#top" data-sec="top">Top</a>
+    <a href="#s-output" data-sec="s-output">Output</a>
+    <a href="#s-publishing" data-sec="s-publishing">Publishing</a>
+    <a href="#s-people" data-sec="s-people">People &amp; funding</a>
+    <a href="#s-trends" data-sec="s-trends">Trends</a>
+    <a href="#s-works" data-sec="s-works">Works</a>
+    <a href="#s-notes" data-sec="s-notes">Notes</a>
+    <span class="nav-sp"></span>
+    <button class="nav-fbtn" id="nav-fbtn" type="button" data-on="0"
+            title="Jump to the filter controls">Filters <b id="nav-fcount">0</b></button>
+    <span class="nav-stat"><b id="nav-count"></b> works</span>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
   <header class="masthead">
     <div class="mast-id">
       <div class="eyebrow">
@@ -521,7 +661,7 @@ footer a:hover { text-decoration: underline; }
   <section class="rail" aria-label="Filters">
     <div class="rail-row">
       <label class="fld grow">
-        <span>Search title, Lehigh author, venue</span>
+        <span>Search title, Lehigh author, source</span>
         <input type="search" id="q" placeholder="e.g. photovoltaic, machine learning, Nature" autocomplete="off">
       </label>
       <label class="fld">
@@ -590,7 +730,7 @@ footer a:hover { text-decoration: underline; }
     </div>
   </section>
 
-  <h2 class="secthead"><span>Output</span><em>How much, how cited, in which subjects</em></h2>
+  <h2 class="secthead" id="s-output"><span>Output</span><em>How much, how cited, in which subjects</em></h2>
   <div class="grid">
     <section class="panel">
       <div class="phead"><h2>Output by year</h2><span class="cnt" id="cnt-year"></span></div>
@@ -617,7 +757,7 @@ footer a:hover { text-decoration: underline; }
     </section>
   </div>
 
-  <h2 class="secthead"><span>Publishing</span><em>Who published it, and how open it came out</em></h2>
+  <h2 class="secthead" id="s-publishing"><span>Publishing</span><em>Who published it, and how open it came out</em></h2>
   <div class="grid">
     <section class="panel span2">
       <div class="phead">
@@ -643,13 +783,18 @@ footer a:hover { text-decoration: underline; }
     </section>
 
     <section class="panel">
-      <div class="phead"><h2>Venues</h2><span class="cnt" id="cnt-src"></span></div>
-      <p class="psub">Journal, proceedings or repository of the primary location.</p>
+      <div class="phead"><h2>Sources</h2><span class="cnt" id="cnt-src"></span></div>
+      <p class="psub">
+        Journal, proceedings or repository of the primary location. Where OpenAlex holds no
+        source &mdash; common for conference proceedings &mdash; one is
+        <span class="drv" title="Built from the DOI prefix, which identifies the registrant, plus the conference acronym in the suffix where present.">derived from the DOI</span>
+        (<span id="cnt-srcd"></span>).
+      </p>
       <div id="ch-src"></div>
     </section>
   </div>
 
-  <h2 class="secthead"><span>Collaboration &amp; support</span><em>People, partners, funders, units</em></h2>
+  <h2 class="secthead" id="s-people"><span>People &amp; funding</span><em>Who wrote it, who with, which unit, and who paid</em></h2>
   <div class="grid">
     <section class="panel">
       <div class="phead"><h2>Lehigh authors</h2><span class="cnt" id="cnt-auth"></span></div>
@@ -680,7 +825,7 @@ footer a:hover { text-decoration: underline; }
 
   </div>
 
-  <h2 class="secthead"><span>Direction</span><em>Where the work is heading, and what it speaks to</em></h2>
+  <h2 class="secthead" id="s-trends"><span>Trends &amp; alignment</span><em>Which subjects are growing, and which global goals the work speaks to</em></h2>
   <div class="grid">
     <section class="panel span2">
       <div class="phead"><h2>Rising &amp; falling subfields</h2><span class="cnt" id="cnt-rise"></span></div>
@@ -710,22 +855,53 @@ footer a:hover { text-decoration: underline; }
     </section>
   </div>
 
-  <section class="panel span2" style="margin-top:16px">
-    <div class="phead"><h2>Works</h2><span class="cnt" id="cnt-tbl"></span></div>
-    <p class="psub">Titles link to the publisher via DOI where one exists, otherwise to the OpenAlex record.</p>
+  <h2 class="secthead" id="s-works">
+    <span>Works</span>
+    <em>The records behind every figure above &mdash; sortable and filterable by column</em>
+  </h2>
+  <section class="panel span2">
+    <div class="phead"><h2>All selected works</h2><span class="cnt" id="cnt-tbl"></span></div>
+    <p class="psub">
+      Titles link to the publisher via DOI where one exists, otherwise to the OpenAlex record.
+      Every column sorts &mdash; <kbd>Click</kbd> a heading &mdash; and the row beneath the headings
+      filters each column. Those filters feed the same state as the controls above, so the charts
+      follow them too.
+    </p>
     <div class="tblwrap">
       <table id="tbl">
-        <thead><tr>
-          <th class="srt" data-s="date" style="width:64px">Date</th>
-          <th>Title &amp; Lehigh authors</th>
-          <th>Venue</th>
-          <th>Field</th>
-          <th>Type</th>
-          <th>Access</th>
-          <th class="srt" data-s="cited" style="text-align:right">Cited</th>
-          <th class="srt" data-s="fwci" style="text-align:right">FWCI</th>
-          <th style="text-align:right">Refs</th>
-        </tr></thead>
+        <thead>
+          <tr>
+            <th class="srt" data-s="date" style="width:64px">Date</th>
+            <th class="srt" data-s="title">Title &amp; Lehigh authors</th>
+            <th class="srt" data-s="src">Source</th>
+            <th class="srt" data-s="pub">Publisher</th>
+            <th class="srt" data-s="fld">Field</th>
+            <th class="srt" data-s="ty">Type</th>
+            <th class="srt" data-s="oa">Access</th>
+            <th class="srt" data-s="cited" style="text-align:right">Cited</th>
+            <th class="srt" data-s="fwci" style="text-align:right">FWCI</th>
+            <th class="srt" data-s="rf" style="text-align:right">Refs</th>
+          </tr>
+          <tr class="filtlabel">
+            <th colspan="10">
+              <span class="fl-k">Filters</span>
+              <span class="fl-hint">type in any column &mdash; matches as you type; <b>&ge;</b> takes a number</span>
+              <button class="fl-clear" id="cf-clear" type="button" disabled>Clear column filters</button>
+            </th>
+          </tr>
+          <tr class="filtrow">
+            <th><input type="search" id="cf-year" placeholder="yr / range" aria-label="Filter by year or range"></th>
+            <th><input type="search" id="cf-title" placeholder="title or author contains…" aria-label="Filter by title or author"></th>
+            <th><input type="search" id="cf-src" placeholder="source contains…" aria-label="Filter by source"></th>
+            <th><input type="search" id="cf-pub" placeholder="publisher contains…" aria-label="Filter by publisher"></th>
+            <th><select id="cf-fld" aria-label="Filter by field"></select></th>
+            <th><select id="cf-ty" aria-label="Filter by type"></select></th>
+            <th><select id="cf-oa" aria-label="Filter by access route"></select></th>
+            <th><input type="search" id="cf-cit" placeholder="≥" aria-label="Minimum citations"></th>
+            <th><input type="search" id="cf-fwci" placeholder="≥" aria-label="Minimum FWCI"></th>
+            <th><input type="search" id="cf-rf" placeholder="≥" aria-label="Minimum references"></th>
+          </tr>
+        </thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
@@ -737,88 +913,135 @@ footer a:hover { text-decoration: underline; }
     </div>
   </section>
 
+  <h2 class="secthead" id="s-notes">
+    <span>Notes</span>
+    <em>Where the data comes from, what is derived rather than reported, and where it is thin</em>
+  </h2>
   <footer>
-    <div>
-      <b>Source</b>
-      Works, citation counts and FWCI from the
-      <a href="https://openalex.org/I186143895" target="_blank" rel="noopener">OpenAlex</a>
-      institution record for Lehigh University (<span id="foot-fetched"></span>). OpenAlex data is
-      CC0. This page holds a snapshot &mdash; it does not query the API live.
+    <div class="notegrid">
+
+    <div class="note">
+      <h3>Provenance</h3>
+      <span class="lead">OpenAlex, snapshotted &mdash; not queried live.</span>
+      <p>
+        Every work with at least one author affiliated to Lehigh University or a unit in its
+        lineage (<a href="https://openalex.org/I186143895" target="_blank" rel="noopener">I186143895</a>,
+        ROR 012afjb06), published 2016&ndash;2026, retrieved <span id="foot-fetched"></span>.
+        OpenAlex data is CC0. <b>2026 is a partial year.</b> Affiliation coverage depends on how
+        publishers tag it, so counts run slightly low, and author name variants are not merged
+        beyond OpenAlex&rsquo;s own disambiguation.
+      </p>
     </div>
-    <div>
-      <b>Reading the numbers</b>
-      FWCI is field-weighted citation impact: 1.0 means a work is cited at the world average
-      for its field, year and type. It is undefined for very recent or unclassified works, which
-      are excluded from FWCI means rather than counted as zero.
+
+    <div class="note">
+      <h3>Departments &mdash; derived</h3>
+      <span class="lead warn">OpenAlex has no department or college field.</span>
+      <p>
+        Units are parsed from the publisher&rsquo;s raw affiliation string; only
+        <b id="foot-dept"></b> of works name one, and the rest sit in <i>unit not stated</i>.
+        Hover any unit chip to see its source string. Renamed units split time series, joint and
+        courtesy appointments are invisible, interdisciplinary strings count under every unit they
+        name, and a few hospital departments arrive via health-network records.
+      </p>
+      <p>
+        <b>Colleges are deliberately absent</b> &mdash; mapping departments onto the five colleges
+        would be inference on top of a 49% sample, and the ambiguous cases are the ones that would
+        mislead. Use Lehigh&rsquo;s faculty-activity system for anything evaluative.
+      </p>
     </div>
-    <div>
-      <b>Caveats</b>
-      2026 is a partial year. Affiliation coverage depends on how publishers tag it, so
-      counts run slightly low, and author name variants are not merged beyond OpenAlex&rsquo;s own
-      disambiguation. &ldquo;Lehigh only&rdquo; means no other institution appears on the byline.
-      Funders are named on <b id="foot-fund"></b> of works, so funder counts are a floor, not a total.
+
+    <div class="note">
+      <h3>Sources &amp; publishers &mdash; partly derived</h3>
+      <span class="lead">OpenAlex holds no source for <b id="foot-srcnone"></b> works; <b id="foot-srcd"></b> are rebuilt from the DOI.</span>
+      <p>
+        IEEE and ACM proceedings often reach Crossref without a registered venue. The DOI prefix
+        identifies the registrant and, for conference registrants, the suffix names the meeting &mdash;
+        so <i>10.1109/cvpr.2018.00143</i> becomes &ldquo;IEEE conference proceedings (CVPR)&rdquo;.
+        Prefix ownership is publicly documented, so this is a lookup rather than a guess, but every
+        such cell is still marked. Acronyms are read verbatim and not expanded.
+      </p>
+      <p>
+        Imprints roll up to the parent company via OpenAlex&rsquo;s own lineage &mdash; the
+        <i>Imprint</i> toggle splits them again. Six parents are renamed for legibility only.
+        Repositories (arXiv, SSRN, bioRxiv, Zenodo, Lehigh Preserve) stay in their own bucket,
+        since hosting a paper is not publishing it. A publisher is named on
+        <b id="foot-pub"></b> of works.
+      </p>
     </div>
-    <div>
-      <b>Departments are derived &mdash; read this</b>
-      OpenAlex has no department or college field. The unit shown is parsed out of the
-      publisher&rsquo;s raw affiliation string, and only <b id="foot-dept"></b> of works name one at all;
-      the rest say just &ldquo;Lehigh University&rdquo; and sit in <i>unit not stated</i>. Hover any unit chip
-      to see the string it came from. Four limits are inherent: renamed units split a time series
-      (Chemical Engineering &rarr; Chemical &amp; Biomolecular Engineering); the string is what an author
-      typed on that paper, so joint and courtesy appointments are invisible; interdisciplinary
-      strings count under every unit they name; and a few hospital departments arrive via health-network
-      records matched to Lehigh. <b>Colleges are deliberately absent</b> &mdash; mapping departments to the
-      five colleges would be inference on top of a 49% sample, and the hard cases (Bioengineering,
-      Psychology, Economics, Community &amp; Population Health) are exactly the ones that would mislead.
-      Use Lehigh&rsquo;s own faculty-activity system for anything evaluative.
+
+    <div class="note">
+      <h3>Citation impact</h3>
+      <span class="lead">FWCI 1.0 is the world average for the same field, year and type.</span>
+      <p>
+        <b id="foot-fwcin"></b> works carry no score and are excluded from every mean rather than
+        counted as zero &mdash; but that exclusion is not random: roughly two-thirds are preprints,
+        datasets and other types FWCI does not define, and most of the rest are 2026 papers too new
+        to score. The mean here is effectively a figure for journal articles and conference papers.
+      </p>
+      <p>
+        It is also a mean of a very skewed distribution. A handful of large collaborations pull it
+        upwards and the median work sits far below it.
+      </p>
     </div>
-    <div id="foot-lw" hidden>
-      <b>Read &amp; publish OA &mdash; one funding route, <span id="lw-years"></span> only</b>
-      <b style="display:inline;text-transform:none;letter-spacing:0;font-size:11.5px;color:var(--brand)">
-        This flag covers APC waivers and discounts under the Libraries&rsquo; read-and-publish
-        agreements with publishers. It is not a measure of library support for open access
-        generally.</b>
-      The Libraries support OA through other routes this sheet does not track &mdash; the
-      institutional repository, subvention and membership funds, consultation, and infrastructure
-      support among them &mdash; and none of those appear here. Two further limits.
-      <b style="display:inline;text-transform:none;letter-spacing:0;font-size:11.5px;color:var(--brand)">
-        Absence of the flag does not mean a work was unsupported:</b>
-      the data begins at agreement year <span id="lw-first"></span>, so anything earlier is
-      unflagged because no record exists, and flagged counts must never be compared across the
-      full 2016&ndash;2026 range. Note too that the agreement year is when the APC was approved,
-      not when the article appeared: they differ for <b>15</b> of these works, and one flagged
-      article carries a 2024 agreement but a 2023 publication date. And matching is by DOI: of
-      <span id="lw-rows"></span> rows in the
-      sheet, <b id="lw-n"></b> matched a work here; <span id="lw-unmatched"></span> did not, nearly
-      all very recent papers absent from this snapshot. Author names and email addresses from the
-      sheet are deliberately excluded from this page.
+
+    <div class="note">
+      <h3>Funders</h3>
+      <span class="lead">Named on <b id="foot-fund"></b> of works, so every funder count is a floor.</span>
+      <p>
+        Works acknowledging no funder are simply absent from the funder list rather than counted as
+        unfunded. A work with several funders counts under each, so the bars sum to more than the
+        work total.
+      </p>
     </div>
-    <div>
-      <b>Publishers</b>
-      Imprints are rolled up to the parent company using OpenAlex&rsquo;s own
-      <i>host_organization_lineage</i>, not a mapping written here &mdash; so Nature Portfolio,
-      Springer Science+Business Media and BioMed Central all sit under Springer Nature, and the
-      Imprint view splits them again. Six parents are renamed for legibility only (a university
-      press otherwise appears as its university, and IEEE and MDPI appear in full). A publisher is
-      named on <b id="foot-pub"></b> of works; conference papers are the bulk of the remainder.
-      Repositories and preprint servers &mdash; arXiv, SSRN, bioRxiv, Zenodo, Lehigh Preserve &mdash;
-      are held in their own bucket, since hosting a paper is not publishing it.
+
+    <div class="note">
+      <h3>Corresponding author</h3>
+      <span class="lead">Recorded on <b id="foot-corr"></b> of works &mdash; so the filter has three states, not two.</span>
+      <p>
+        Lehigh, elsewhere, and <i>not recorded</i>. The last is unknown, not negative: treating it
+        as &ldquo;not Lehigh&rdquo; would understate Lehigh-led output by roughly a third.
+      </p>
     </div>
-    <div>
-      <b>Sustainable Development Goals</b>
-      Goal tags are machine predictions made by OpenAlex, not author or publisher declarations,
-      and only those at 0.4 confidence or above are counted &mdash; <b id="foot-sdg"></b> of works
-      carry at least one. A work can be tagged to several goals, so the spokes sum to more than the
-      work count. Spoke length encodes works, but a wedge&rsquo;s <i>area</i> grows faster than its
-      value, so compare exact figures in the ranked list rather than by eye.
+
+    <div class="note">
+      <h3>Sustainable Development Goals</h3>
+      <span class="lead">Machine predictions by OpenAlex, not author or publisher declarations.</span>
+      <p>
+        Only predictions at 0.4 confidence or above are counted; <b id="foot-sdg"></b> of works
+        carry at least one. A work can serve several goals, so the spokes sum to more than the work
+        count. Spoke length encodes works, but a wedge&rsquo;s <i>area</i> grows faster than its
+        value &mdash; compare exact figures in the ranked list rather than by eye.
+      </p>
     </div>
-    <div>
-      <b>Corresponding author</b>
-      Publishers mark one on <b id="foot-corr"></b> of these works. The filter therefore has three
-      states, not two: Lehigh, elsewhere, and not recorded. &ldquo;Not recorded&rdquo; is unknown &mdash;
-      treating it as &ldquo;not Lehigh&rdquo; would understate Lehigh-led output by a wide margin.
+
+    <div class="note wide" id="foot-lw" hidden>
+      <h3>Read &amp; publish OA &mdash; <span id="lw-years"></span> only</h3>
+      <span class="lead warn">
+        One funding route, not a measure of library support for open access generally &mdash; and
+        absence of the flag does not mean a work was unsupported.
+      </span>
+      <p>
+        The flag marks APC waivers and discounts under the Libraries&rsquo; read-and-publish
+        agreements with publishers, taken from their own tracking sheet and matched by DOI. Support
+        delivered through other routes &mdash; the institutional repository, subvention and
+        membership funds, consultation, infrastructure &mdash; is not tracked there and so does not
+        appear here at all.
+      </p>
+      <p>
+        Coverage begins at agreement year <span id="lw-first"></span>: anything earlier is unflagged
+        because no record exists, so flagged counts must never be compared across the full
+        2016&ndash;2026 range. Agreement year is when the APC was approved, not when the article
+        appeared &mdash; they differ for <b>15</b> works, one of which pairs a 2024 agreement with a
+        2023 publication date. Of <span id="lw-rows"></span> sheet rows, <b id="lw-n"></b> matched a
+        work here and <span id="lw-unmatched"></span> did not, nearly all very recent papers absent
+        from this snapshot. Author names and email addresses from the sheet are deliberately
+        excluded from this page.
+      </p>
+    </div>
+
     </div>
   </footer>
+
 </div>
 
 <div class="tip" id="tip" role="status" aria-live="polite"></div>
@@ -872,7 +1095,7 @@ footer a:hover { text-decoration: underline; }
       intl: cc.some(function (c) { return c !== "US"; }),
       solo: r[I.ci].length === 0,
       doi: r[I.doi], rt: r[I.rt] === 1, rf: r[I.rf],
-      lw: r[I.lw] || null,
+      lw: r[I.lw] || null, srcd: r[I.srcd] === 1,
       co: r[I.co], cn: r[I.cn],
       dept: r[I.dept].map(function (i) { return T.dept[i]; }),
       fund: r[I.fund].map(function (i) { return T.fund[i]; }),
@@ -885,6 +1108,12 @@ footer a:hover { text-decoration: underline; }
       sk: r[I.y] * 10000 + (r[I.d] ? (+r[I.d].slice(0, 2) * 100 + +r[I.d].slice(3, 5)) : 0)
     };
   });
+  /* lower-cased haystacks for the per-column contains filters */
+  W.forEach(function (w) {
+    w.tl = (w.t + " " + w.la.join(" ")).toLowerCase();
+    w.sl = w.src.toLowerCase();
+    w.pl = (w.pub + " " + w.imp).toLowerCase();
+  });
 
   var YEARS = [];
   for (var yy = META.years[0]; yy <= META.years[1]; yy++) YEARS.push(yy);
@@ -895,6 +1124,7 @@ footer a:hover { text-decoration: underline; }
     collab: "any", oa: "", src: "", inst: "", auth: "", sub: "",
     dept: "", fund: "", corr: "any", lw: "any",
     pub: "", imp: "", sdg: 0, pubmode: "parent",
+    tq: "", srcq: "", pubq: "", citMin: 0, fwciMin: 0, refMin: 0,
     sort: "cited", dir: -1, page: 1
   };
   var expanded = Object.create(null);   /* publisher rows opened for imprint detail */
@@ -950,6 +1180,13 @@ footer a:hover { text-decoration: underline; }
     if (skip !== "pub" && S.imp && w.imp !== S.imp) return false;
     if (skip !== "sdg" && S.sdg && w.sdg.indexOf(S.sdg) < 0) return false;
     if (S.lw === "yes" && !w.lw) return false;
+    /* per-column filters from the table header */
+    if (S.tq && w.tl.indexOf(S.tq) < 0) return false;
+    if (S.srcq && w.sl.indexOf(S.srcq) < 0) return false;
+    if (S.pubq && w.pl.indexOf(S.pubq) < 0) return false;
+    if (S.citMin && w.c < S.citMin) return false;
+    if (S.fwciMin && (w.f == null || w.f < S.fwciMin)) return false;
+    if (S.refMin && w.rf < S.refMin) return false;
     return true;
   }
   function select(skip) {
@@ -1216,8 +1453,11 @@ footer a:hover { text-decoration: underline; }
   }
 
   /* ---------- render ---------- */
+  var lastCount = 0;
   function render() {
     var rows = select();
+    lastCount = rows.length;
+    syncControls();          /* chart clicks change state too — keep every control honest */
     renderKpis(rows);
     renderChips();
 
@@ -1284,7 +1524,8 @@ footer a:hover { text-decoration: underline; }
 
     /* venues, authors, partners, subfields */
     var bySrc = tally(rows, function (w) { return w.src; });
-    $("cnt-src").textContent = num(bySrc.length) + " venues";
+    $("cnt-src").textContent = num(bySrc.length) + " sources";
+    $("cnt-srcd").textContent = num(META.src_derived) + " works";
     barList($("ch-src"), bySrc, {
       key: "src", limit: 10,
       total: rows.length, color: "--s3", active: S.src,
@@ -1789,11 +2030,31 @@ footer a:hover { text-decoration: underline; }
   var PER = 40;
   function renderTable(rows) {
     var dir = S.dir;
+    /* every column is sortable; strings compare with localeCompare, numbers
+       numerically, and a missing value always sorts to the bottom */
+    var TEXT = { title: "t", src: "src", pub: "pub", fld: "fld" };
     var sorted = rows.slice().sort(function (a, b) {
-      var av, bv;
-      if (S.sort === "cited") { av = a.c; bv = b.c; }
-      else if (S.sort === "fwci") { av = a.f == null ? -1 : a.f; bv = b.f == null ? -1 : b.f; }
-      else { av = a.sk; bv = b.sk; }
+      var s = S.sort, av, bv;
+      if (TEXT[s]) {
+        av = (a[TEXT[s]] || ""); bv = (b[TEXT[s]] || "");
+        if (!av !== !bv) return av ? -1 : 1;          /* blanks last, both ways */
+        var c = av.localeCompare(bv, "en", { sensitivity: "base" });
+        return c * dir || b.sk - a.sk;
+      }
+      if (s === "ty") {
+        av = TYPE_LABEL[a.ty] || a.ty; bv = TYPE_LABEL[b.ty] || b.ty;
+        return av.localeCompare(bv, "en") * dir || b.sk - a.sk;
+      }
+      if (s === "oa") {
+        av = OA_ORDER.indexOf(a.oa); bv = OA_ORDER.indexOf(b.oa);
+      } else if (s === "cited") { av = a.c; bv = b.c; }
+      else if (s === "rf") { av = a.rf; bv = b.rf; }
+      else if (s === "fwci") {
+        av = a.f == null ? -Infinity : a.f; bv = b.f == null ? -Infinity : b.f;
+        if (av === -Infinity || bv === -Infinity) {
+          if (av !== bv) return av === -Infinity ? 1 : -1;   /* undefined last */
+        }
+      } else { av = a.sk; bv = b.sk; }
       return (av - bv) * dir || b.sk - a.sk;
     });
     var pages = Math.max(1, Math.ceil(sorted.length / PER));
@@ -1854,7 +2115,17 @@ footer a:hover { text-decoration: underline; }
             (w.aw.length ? " — awards: " + esc(w.aw.join(", ")) : "") + '">' +
             esc(w.fund[0]) + (w.fund.length > 1 ? " +" + (w.fund.length - 1) : "") + "</span>"
           : "") + "</div></td>" +
-        '<td class="c-src">' + (w.src ? esc(w.src) : '<em style="color:var(--muted)">&mdash;</em>') + "</td>" +
+        '<td class="c-src">' + (w.src
+          ? esc(w.src) + (w.srcd
+              ? ' <span class="drvmark" title="Derived from the DOI prefix (' +
+                esc((w.doi || "").split("/")[0]) + '). OpenAlex holds no source record for this ' +
+                'work, which is common for conference proceedings.">derived</span>'
+              : "")
+          : '<em style="color:var(--muted)">&mdash;</em>') + "</td>" +
+        '<td class="c-pub">' + (w.pub && w.pub !== META.pub_none
+          ? esc(w.pub) + (w.imp && w.imp !== w.pub
+              ? '<div class="c-imp">' + esc(w.imp) + "</div>" : "")
+          : '<em style="color:var(--muted)">&mdash;</em>') + "</td>" +
         "<td>" + (w.fld ? esc(w.fld) : "&mdash;") + "</td>" +
         "<td>" + esc(TYPE_LABEL[w.ty] || w.ty) + "</td>" +
         '<td><span class="tag"><span class="dot" style="background:var(' + oam.v + ')"></span>' + oam.label + "</span></td>" +
@@ -1875,6 +2146,7 @@ footer a:hover { text-decoration: underline; }
     $("pg-next").disabled = S.page >= pages;
     $("pg-prev").style.opacity = S.page <= 1 ? .45 : 1;
     $("pg-next").style.opacity = S.page >= pages ? .45 : 1;
+    syncClearBtn();
   }
 
   /* ---------- active filter chips ---------- */
@@ -1899,14 +2171,21 @@ footer a:hover { text-decoration: underline; }
       function () { S.sdg = 0; }]);
     if (S.lw === "yes") cs.push(["Read & publish", "Agreement APCs · 2024–26 only",
       function () { S.lw = "any"; }]);
+    if (S.tq) cs.push(["Title/author", '"' + S.tq + '"', function () { S.tq = ""; }]);
+    if (S.srcq) cs.push(["Source", '"' + S.srcq + '"', function () { S.srcq = ""; }]);
+    if (S.pubq) cs.push(["Publisher", '"' + S.pubq + '"', function () { S.pubq = ""; }]);
+    if (S.citMin) cs.push(["Cited", "≥ " + num(S.citMin), function () { S.citMin = 0; }]);
+    if (S.fwciMin) cs.push(["FWCI", "≥ " + S.fwciMin, function () { S.fwciMin = 0; }]);
+    if (S.refMin) cs.push(["Refs", "≥ " + num(S.refMin), function () { S.refMin = 0; }]);
     if (S.corr !== "any") cs.push(["Corresponding",
       { lehigh: "Lehigh", other: "Elsewhere", none: "Not recorded" }[S.corr],
       function () { S.corr = "any"; }]);
-    if (S.src) cs.push(["Venue", S.src, function () { S.src = ""; }]);
+    if (S.src) cs.push(["Source", S.src, function () { S.src = ""; }]);
     if (S.auth) cs.push(["Author", S.auth, function () { S.auth = ""; }]);
     if (S.inst) cs.push(["Partner", S.inst, function () { S.inst = ""; }]);
 
     var bar = $("chipbar");
+    syncNav(lastCount, cs.length);
     bar.hidden = !cs.length;
     bar.innerHTML = '<span class="chipbar-k">Active</span>';
     cs.forEach(function (c) {
@@ -1926,6 +2205,8 @@ footer a:hover { text-decoration: underline; }
         S.type = ""; S.cit = 0; S.collab = "any"; S.oa = ""; S.src = ""; S.auth = ""; S.inst = "";
         S.dept = ""; S.fund = ""; S.corr = "any";
         S.pub = ""; S.imp = ""; S.sdg = 0; S.lw = "any";
+        S.tq = ""; S.srcq = ""; S.pubq = "";
+        S.citMin = 0; S.fwciMin = 0; S.refMin = 0;
         syncControls(); S.page = 1; render();
       });
       bar.appendChild(all);
@@ -1955,6 +2236,16 @@ footer a:hover { text-decoration: underline; }
     $("fund").innerHTML = option("", "All funders") + funds.map(function (f) {
       return option(f.k, esc(f.k) + " (" + num(f.n) + ")");
     }).join("");
+    /* the table header's own selects mirror the rail's global state */
+    $("cf-fld").innerHTML = option("", "All") + fields.map(function (f) {
+      return option(f.k, esc(f.k));
+    }).join("");
+    $("cf-ty").innerHTML = option("", "All") + types.map(function (t) {
+      return option(t.k, esc(TYPE_LABEL[t.k] || t.k));
+    }).join("");
+    $("cf-oa").innerHTML = option("", "All") + OA_ORDER.concat(["unknown"])
+      .filter(function (k) { return W.some(function (w) { return w.oa === k; }); })
+      .map(function (k) { return option(k, OA_META[k].label); }).join("");
     $("mast-fetched").textContent = "snapshot " + META.fetched;
     $("foot-fetched").textContent = "retrieved " + META.fetched;
     $("lbl-fund").textContent = META.fund_coverage + "% coverage";
@@ -1975,10 +2266,15 @@ footer a:hover { text-decoration: underline; }
     $("foot-corr").textContent = META.corr_coverage + "%";
     $("foot-fund").textContent = META.fund_coverage + "%";
     $("foot-pub").textContent = META.pub_coverage + "%";
+    $("foot-srcd").textContent = num(META.src_derived);
+    $("foot-fwcin").textContent = num(META.n - W.filter(function (w) {
+      return w.f != null;
+    }).length);
+    $("foot-srcnone").textContent = num(META.src_absent_in_openalex);
     $("foot-sdg").textContent = META.sdg_coverage + "%";
   }
   function syncControls() {
-    $("q").value = S.q;
+    if (document.activeElement !== $("q")) $("q").value = S.q;
     $("field").value = S.field;
     $("type").value = S.type;
     $("cit").value = String(S.cit);
@@ -1995,6 +2291,21 @@ footer a:hover { text-decoration: underline; }
     Array.prototype.forEach.call($("lw").children, function (b) {
       b.setAttribute("aria-pressed", String(b.dataset.v === S.lw));
     });
+    /* header controls: never clobber the box the user is typing in */
+    var act = document.activeElement ? document.activeElement.id : "";
+    $("cf-fld").value = S.field;
+    $("cf-ty").value = S.type;
+    $("cf-oa").value = S.oa;
+    if (act !== "cf-title") $("cf-title").value = S.tq;
+    if (act !== "cf-src") $("cf-src").value = S.srcq;
+    if (act !== "cf-pub") $("cf-pub").value = S.pubq;
+    if (act !== "cf-cit") $("cf-cit").value = S.citMin || "";
+    if (act !== "cf-fwci") $("cf-fwci").value = S.fwciMin || "";
+    if (act !== "cf-rf") $("cf-rf").value = S.refMin || "";
+    if (act !== "cf-year") {
+      $("cf-year").value = (S.y0 === META.years[0] && S.y1 === META.years[1]) ? ""
+        : (S.y0 === S.y1 ? String(S.y0) : S.y0 + "–" + S.y1);
+    }
   }
 
   var deb;
@@ -2040,16 +2351,148 @@ footer a:hover { text-decoration: underline; }
   $("dept").addEventListener("change", function (e) { S.dept = e.target.value; S.page = 1; render(); });
   $("fund").addEventListener("change", function (e) { S.fund = e.target.value; S.page = 1; render(); });
   document.querySelector("thead").addEventListener("click", function (e) {
+    if (e.target.closest(".filtrow")) return;     /* clicks in the filter row are not sorts */
     var th = e.target.closest("th.srt"); if (!th) return;
     if (S.sort === th.dataset.s) S.dir = -S.dir;
     else { S.sort = th.dataset.s; S.dir = -1; }
     S.page = 1; render();
   });
+
+  /* ---- per-column filters in the table header ---- */
+  function colText(id, key) {
+    var el = $(id), t;
+    el.addEventListener("input", function () {
+      clearTimeout(t);
+      var v = el.value.trim().toLowerCase();
+      t = setTimeout(function () { S[key] = v; S.page = 1; render(); }, 160);
+    });
+  }
+  colText("cf-title", "tq");
+  colText("cf-src", "srcq");
+  colText("cf-pub", "pubq");
+
+  function colNum(id, key) {
+    var el = $(id), t;
+    el.addEventListener("input", function () {
+      clearTimeout(t);
+      var v = parseFloat(el.value);
+      t = setTimeout(function () {
+        S[key] = isFinite(v) && v > 0 ? v : 0;
+        S.page = 1; render();
+      }, 200);
+    });
+  }
+  colNum("cf-cit", "citMin");
+  colNum("cf-fwci", "fwciMin");
+  colNum("cf-rf", "refMin");
+
+  /* the Date column accepts a year or a range and drives the global year filter */
+  var yrT;
+  $("cf-year").addEventListener("input", function () {
+    clearTimeout(yrT);
+    var raw = $("cf-year").value.trim();
+    yrT = setTimeout(function () {
+      var lo = META.years[0], hi = META.years[1];
+      var m = raw.match(/^(\d{4})\s*(?:[-–—to]+\s*(\d{4}))?$/);
+      if (m) {
+        lo = Math.max(META.years[0], Math.min(META.years[1], +m[1]));
+        hi = m[2] ? Math.max(META.years[0], Math.min(META.years[1], +m[2])) : lo;
+        if (lo > hi) { var t2 = lo; lo = hi; hi = t2; }
+      }
+      S.y0 = lo; S.y1 = hi; S.page = 1; syncControls(); render();
+    }, 250);
+  });
+
+  $("cf-fld").addEventListener("change", function (e) {
+    S.field = e.target.value; S.sub = ""; S.page = 1; syncControls(); render();
+  });
+  $("cf-ty").addEventListener("change", function (e) {
+    S.type = e.target.value; S.page = 1; syncControls(); render();
+  });
+  $("cf-oa").addEventListener("change", function (e) {
+    S.oa = e.target.value; S.page = 1; syncControls(); render();
+  });
   $("pg-prev").addEventListener("click", function () { if (S.page > 1) { S.page--; render(); scrollTbl(); } });
   $("pg-next").addEventListener("click", function () { S.page++; render(); scrollTbl(); });
+  /* ---------- section navigation ---------- */
+  function initNav() {
+    var links = Array.prototype.slice.call(document.querySelectorAll(".nav-in a"));
+    var targets = links.map(function (a) { return document.getElementById(a.dataset.sec); });
+
+    function markActive() {
+      /* the section whose heading last passed under the nav strip wins */
+      var line = 56, best = 0;
+      targets.forEach(function (el, i) {
+        if (el && el.getBoundingClientRect().top <= line) best = i;
+      });
+      links.forEach(function (a, i) {
+        if (i === best) a.classList.add("active"); else a.classList.remove("active");
+      });
+    }
+    /* Called straight from the scroll event: seven getBoundingClientRect reads
+       is cheap, and a requestAnimationFrame latch would stick permanently if
+       the tab were hidden mid-scroll (rAF does not fire in a hidden tab). */
+    window.addEventListener("scroll", markActive, { passive: true });
+    window.addEventListener("hashchange", markActive);
+    window.addEventListener("resize", markActive, { passive: true });
+    markActive();
+
+    $("nav-fbtn").addEventListener("click", function () {
+      var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document.querySelector(".rail").scrollIntoView({
+        behavior: reduce ? "auto" : "smooth", block: "start"
+      });
+      var first = $("q");
+      if (first) setTimeout(function () { first.focus({ preventScroll: true }); },
+                            reduce ? 0 : 380);
+      markActive();
+    });
+  }
+
+  /* nav strip mirrors the live selection so the tall rail needn't stay pinned */
+  function syncNav(n, chipCount) {
+    $("nav-count").textContent = num(n);
+    $("nav-fcount").textContent = chipCount;
+    $("nav-fbtn").dataset.on = chipCount ? "1" : "0";
+    $("nav-fbtn").title = chipCount
+      ? chipCount + (chipCount === 1 ? " filter" : " filters") + " active — jump to the controls"
+      : "Jump to the filter controls";
+  }
+
+  /* Sticky offsets depend on the real rendered heights of the two header rows
+     above the inputs, which change with font loading and viewport width. */
+  function measureHeader() {
+    var wrap = document.querySelector(".tblwrap");
+    var sortRow = document.querySelector("#tbl thead tr:first-child");
+    var labRow = document.querySelector("#tbl .filtlabel");
+    if (!wrap || !sortRow || !labRow) return;
+    wrap.style.setProperty("--h-sort", Math.round(sortRow.getBoundingClientRect().height) + "px");
+    wrap.style.setProperty("--h-lab", Math.round(labRow.getBoundingClientRect().height) + "px");
+  }
+
+  var COLUMN_FILTERS = ["tq", "srcq", "pubq", "citMin", "fwciMin", "refMin"];
+  function columnFiltersActive() {
+    return COLUMN_FILTERS.some(function (k) { return S[k]; }) ||
+      S.field || S.type || S.oa ||
+      S.y0 !== META.years[0] || S.y1 !== META.years[1];
+  }
+  function syncClearBtn() {
+    var b = $("cf-clear");
+    if (b) b.disabled = !columnFiltersActive();
+  }
+
+  $("cf-clear").addEventListener("click", function () {
+    S.tq = ""; S.srcq = ""; S.pubq = "";
+    S.citMin = 0; S.fwciMin = 0; S.refMin = 0;
+    S.field = ""; S.type = ""; S.oa = "";
+    S.y0 = META.years[0]; S.y1 = META.years[1];
+    syncControls(); S.page = 1; render();
+    document.querySelector(".tblwrap").scrollTop = 0;
+  });
+
   function scrollTbl() {
-    var t = document.getElementById("tbl");
-    window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 120, behavior: "smooth" });
+    /* new page of results starts at the top of the table's own scroll box */
+    document.querySelector(".tblwrap").scrollTop = 0;
   }
   $("theme").addEventListener("click", function () {
     var r = document.documentElement, cur = r.getAttribute("data-theme");
@@ -2062,5 +2505,10 @@ footer a:hover { text-decoration: underline; }
   buildControls();
   syncControls();
   render();
+  initNav();
+  measureHeader();
+  /* fonts land after first paint and change the header height */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureHeader);
+  window.addEventListener("resize", measureHeader, { passive: true });
 })();
 </script>
