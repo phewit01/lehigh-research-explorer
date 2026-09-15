@@ -211,6 +211,11 @@ input[type="search"]:focus-visible, select:focus-visible, button:focus-visible, 
 .chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chip i { font-style: normal; font-size: 14px; line-height: 1; opacity: .6; padding: 0 2px; }
 .chip:hover i { opacity: 1; }
+.dropnote {
+  font: 400 11px var(--f-body); color: var(--down);
+  border: 1px dashed color-mix(in oklab, var(--down) 40%, transparent);
+  border-radius: 2px; padding: 3px 7px;
+}
 
 /* ---------- panels ---------- */
 .grid {
@@ -643,6 +648,8 @@ footer { margin-top: 8px; }
     <a href="#s-works" data-sec="s-works">Works</a>
     <a href="#s-notes" data-sec="s-notes">Notes</a>
     <span class="nav-sp"></span>
+    <button class="nav-fbtn" id="nav-copy" type="button"
+            title="Copy a link to this exact filtered view">Copy link</button>
     <button class="nav-fbtn" id="nav-fbtn" type="button" data-on="0"
             title="Jump to the filter controls">Filters <b id="nav-fcount">0</b></button>
     <span class="nav-stat"><b id="nav-count"></b> works</span>
@@ -1600,6 +1607,7 @@ footer { margin-top: 8px; }
     renderRise(rows);
     renderSdg(select("sdg"));
     renderTable(rows);
+    writeUrl();
   }
 
   /* ---------- publishers: stacked by OA route, parent rows expandable ---------- */
@@ -2200,8 +2208,17 @@ footer { margin-top: 8px; }
 
     var bar = $("chipbar");
     syncNav(lastCount, cs.length);
-    bar.hidden = !cs.length;
+    bar.hidden = !cs.length && !droppedParams.length;
     bar.innerHTML = '<span class="chipbar-k">Active</span>';
+    if (droppedParams.length) {
+      /* a shared link named something this snapshot no longer has */
+      var warn = document.createElement("span");
+      warn.className = "dropnote";
+      warn.textContent = "Link ignored " + droppedParams.length +
+        (droppedParams.length === 1 ? " filter" : " filters") +
+        " not present in this data: " + droppedParams.join(", ");
+      bar.appendChild(warn);
+    }
     cs.forEach(function (c) {
       var b = document.createElement("button");
       b.type = "button"; b.className = "chip";
@@ -2428,6 +2445,124 @@ footer { margin-top: 8px; }
   });
   $("pg-prev").addEventListener("click", function () { if (S.page > 1) { S.page--; render(); scrollTbl(); } });
   $("pg-next").addEventListener("click", function () { S.page++; render(); scrollTbl(); });
+  /* ---------- filter state in the URL ----------
+     Filters live in the query string; the hash is left to the section anchors
+     so the two never collide. Only non-default values are written, so a clean
+     view has a clean URL. Values that name data (a field, an author, a
+     publisher) are validated against the loaded tables on the way in: a stale
+     shared link then drops the dead filter and says so, rather than silently
+     rendering an empty page. */
+  var URL_KEYS = [
+    ["q", "q", "text"],
+    ["y0", "from", "int"], ["y1", "to", "int"],
+    ["field", "field", "set"], ["sub", "sub", "set"], ["type", "type", "set"],
+    ["oa", "oa", "set"], ["dept", "dept", "set"], ["fund", "funder", "set"],
+    ["src", "source", "set"], ["auth", "author", "set"], ["inst", "partner", "set"],
+    ["pub", "pub", "set"], ["imp", "imprint", "set"],
+    ["cit", "cited", "int"], ["citMin", "citmin", "int"],
+    ["fwciMin", "fwcimin", "num"], ["refMin", "refmin", "int"],
+    ["collab", "collab", "enum"], ["corr", "corr", "enum"], ["lw", "rp", "enum"],
+    ["pubmode", "pubmode", "enum"], ["sdg", "sdg", "int"],
+    ["tq", "title", "text"], ["srcq", "srcq", "text"], ["pubq", "pubq", "text"],
+    ["sort", "sort", "enum"], ["dir", "dir", "int"], ["page", "page", "int"]
+  ];
+  var ENUMS = {
+    collab: ["any", "intl", "solo"],
+    corr: ["any", "lehigh", "other", "none"],
+    lw: ["any", "yes"],
+    pubmode: ["parent", "imprint"],
+    sort: ["date", "title", "src", "pub", "fld", "ty", "oa", "cited", "fwci", "rf"]
+  };
+  var VALID = null;
+  function validSets() {
+    if (VALID) return VALID;
+    VALID = { field: new Set(), sub: new Set(), type: new Set(), oa: new Set(),
+              dept: new Set(), fund: new Set(), src: new Set(), auth: new Set(),
+              inst: new Set(), pub: new Set(), imp: new Set() };
+    W.forEach(function (w) {
+      if (w.fld) VALID.field.add(w.fld);
+      if (w.sub) VALID.sub.add(w.sub);
+      VALID.type.add(w.ty); VALID.oa.add(w.oa);
+      if (w.src) VALID.src.add(w.src);
+      if (w.pub) VALID.pub.add(w.pub);
+      if (w.imp) VALID.imp.add(w.imp);
+      w.dept.forEach(function (d) { VALID.dept.add(d); });
+      w.fund.forEach(function (f) { VALID.fund.add(f); });
+      w.la.forEach(function (a) { VALID.auth.add(a); });
+      w.ci.forEach(function (i) { VALID.inst.add(i); });
+    });
+    return VALID;
+  }
+
+  var droppedParams = [];
+  function readUrl() {
+    var params;
+    try { params = new URLSearchParams(location.search); } catch (e) { return; }
+    if (!params.toString()) return;
+    var sets = validSets();
+    URL_KEYS.forEach(function (spec) {
+      var key = spec[0], name = spec[1], kind = spec[2];
+      if (!params.has(name)) return;
+      var raw = params.get(name).trim();
+      if (!raw) return;
+      if (kind === "text") { S[key] = raw.toLowerCase(); return; }
+      if (kind === "int" || kind === "num") {
+        var n = kind === "int" ? parseInt(raw, 10) : parseFloat(raw);
+        if (isNaN(n)) { droppedParams.push(name); return; }
+        S[key] = n;
+        return;
+      }
+      if (kind === "enum") {
+        if (ENUMS[key] && ENUMS[key].indexOf(raw) < 0) { droppedParams.push(name); return; }
+        S[key] = raw;
+        return;
+      }
+      if (kind === "set") {
+        if (sets[key] && !sets[key].has(raw)) { droppedParams.push(name + "=" + raw); return; }
+        S[key] = raw;
+      }
+    });
+    /* sanity: clamp the year range and keep it ordered */
+    S.y0 = Math.min(Math.max(S.y0, META.years[0]), META.years[1]);
+    S.y1 = Math.min(Math.max(S.y1, META.years[0]), META.years[1]);
+    if (S.y0 > S.y1) { var t = S.y0; S.y0 = S.y1; S.y1 = t; }
+    if (S.dir !== 1 && S.dir !== -1) S.dir = -1;
+    if (S.page < 1) S.page = 1;
+    if (S.sdg && !(S.sdg >= 1 && S.sdg <= 17)) { S.sdg = 0; droppedParams.push("sdg"); }
+  }
+
+  var DEFAULTS = {
+    q: "", y0: META.years[0], y1: META.years[1], field: "", sub: "", type: "",
+    oa: "", dept: "", fund: "", src: "", auth: "", inst: "", pub: "", imp: "",
+    cit: 0, citMin: 0, fwciMin: 0, refMin: 0, collab: "any", corr: "any",
+    lw: "any", pubmode: "parent", sdg: 0, tq: "", srcq: "", pubq: "",
+    sort: "cited", dir: -1, page: 1
+  };
+  function stateQuery() {
+    var p = new URLSearchParams();
+    URL_KEYS.forEach(function (spec) {
+      var key = spec[0], name = spec[1];
+      if (S[key] !== DEFAULTS[key] && S[key] !== "" && S[key] != null) p.set(name, S[key]);
+    });
+    return p.toString();
+  }
+  var urlTimer;
+  function writeUrl() {
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function () {
+      try {
+        var qs = stateQuery();
+        history.replaceState(null, "", qs ? "?" + qs + location.hash
+                                         : location.pathname + location.hash);
+      } catch (e) { /* sandboxed frame — URL sharing simply isn't available there */ }
+    }, 250);
+  }
+
+  function shareUrl() {
+    var qs = stateQuery();
+    return location.origin + location.pathname + (qs ? "?" + qs : "");
+  }
+
   /* ---------- section navigation ---------- */
   function initNav() {
     var links = Array.prototype.slice.call(document.querySelectorAll(".nav-in a"));
@@ -2460,6 +2595,32 @@ footer { margin-top: 8px; }
       if (first) setTimeout(function () { first.focus({ preventScroll: true }); },
                             reduce ? 0 : 380);
       markActive();
+    });
+
+    /* Copy the shareable URL. execCommand is the fallback because the async
+       clipboard API is unavailable in some embedded contexts. */
+    $("nav-copy").addEventListener("click", function () {
+      var url = shareUrl(), btn = $("nav-copy");
+      function done(okFlag) {
+        btn.textContent = okFlag ? "Copied" : "Copy failed";
+        setTimeout(function () { btn.textContent = "Copy link"; }, 1600);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () { done(true); },
+                                                function () { legacy(); });
+      } else { legacy(); }
+      function legacy() {
+        var ta = document.createElement("textarea");
+        ta.value = url;
+        ta.setAttribute("readonly", "");
+        ta.style.cssText = "position:fixed;top:-1000px;opacity:0";
+        document.body.appendChild(ta);
+        ta.select();
+        var okFlag = false;
+        try { okFlag = document.execCommand("copy"); } catch (e) { okFlag = false; }
+        document.body.removeChild(ta);
+        done(okFlag);
+      }
     });
   }
 
@@ -2517,6 +2678,7 @@ footer { margin-top: 8px; }
   window.addEventListener("scroll", hideTip, { passive: true });
 
   buildControls();
+  readUrl();               /* a shared link sets the state before the first paint */
   syncControls();
   render();
   initNav();
