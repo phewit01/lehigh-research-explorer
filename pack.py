@@ -24,6 +24,15 @@ except FileNotFoundError:
     WAIVERS = None
     print("note: waivers.json absent — library-supported toggle will be omitted")
 
+# OpenAlex IDs that no longer resolve, from check_dead_ids.py. A no-DOI row is
+# linked by its OpenAlex ID, and since Sept 2026 those IDs are routinely merged
+# or retired, so the link dies. Marked rather than linked.
+try:
+    DEAD = set(json.load(open("dead_ids.json", encoding="utf-8"))["dead"])
+except (FileNotFoundError, KeyError):
+    DEAD = set()
+    print("note: dead_ids.json absent — run check_dead_ids.py to flag retired IDs")
+
 
 def norm_doi(v):
     if not v:
@@ -44,6 +53,16 @@ def redact(s):
     if not s:
         return s
     return EMAIL_RE.sub("[email removed]", s)
+
+
+def clean(s):
+    """Collapse whitespace runs. OpenAlex source names carry stray double
+    spaces ("2018  AIAA Aerospace Sciences Meeting"), and collation ranks a
+    space below a digit — so an uncleaned name sorts somewhere the reader,
+    seeing HTML-collapsed whitespace, cannot predict."""
+    if not s:
+        return s
+    return re.sub(r"\s+", " ", s).strip()
 
 # (canonical unit, alias patterns matched against the normalised string)
 DEPTS = [
@@ -112,6 +131,57 @@ PUB_DISPLAY = {
 }
 PUB_REPO = "Repositories & preprint servers"
 PUB_NONE = "No publisher recorded"
+
+# ---- fallback for works OpenAlex holds with no source record at all ----
+# 14% of the corpus, 1,240 of them conference papers: IEEE and ACM proceedings
+# routinely arrive with a DOI but no registered venue. The DOI itself names the
+# registrant, and for conference-heavy registrants the suffix often names the
+# conference (10.1109/cvpr.2018.00143 -> IEEE, CVPR). Derived, and flagged.
+from doi_registrants import REGISTRANTS
+
+TYPE_WORD = {
+    "conference-paper": "conference proceedings",
+    "conference-abstract": "conference proceedings",
+    "book-chapter": "book chapter",
+    "book": "book",
+    "reference-entry": "reference work",
+    "preprint": "preprint",
+    "report": "report",
+    "article": "journal article",
+    "review": "review",
+    "dataset": "dataset",
+    "peer-review": "peer review",
+    "dissertation": "dissertation",
+    "editorial": "editorial",
+}
+ACRONYM_RE = re.compile(r"^([a-z][a-z0-9]{1,11})[._\-/]")
+
+
+def derive_source(w):
+    """(source label, publisher) from the DOI when OpenAlex has no source."""
+    doi = (w.get("doi") or "").lower()
+    if "/" not in doi:
+        return None, None
+    prefix, suffix = doi.split("/", 1)
+    ent = REGISTRANTS.get(prefix)
+    if not ent:
+        return None, None
+    publisher, conf_style = ent
+    ty = (w.get("ty") or "").rsplit("/", 1)[-1]
+
+    acronym = None
+    if conf_style and ty in ("conference-paper", "conference-abstract"):
+        m = ACRONYM_RE.match(suffix)
+        if m:
+            a = re.sub(r"\d+$", "", m.group(1))      # IEEE appends record ids
+            if 2 <= len(a) <= 8 and a.isalpha():
+                acronym = a.upper()
+
+    word = TYPE_WORD.get(ty)
+    label = publisher + (" " + word if word else "")
+    if acronym:
+        label += f" ({acronym})"
+    return label, publisher
 
 
 def publisher_of(w):
@@ -198,7 +268,21 @@ dept_hits = 0
 pub_named = 0
 sdg_tagged = 0
 lw_hits = 0
+src_absent = sum(1 for w in works if not (w.get("src") or "").strip())
 for w in works:
+    # Fill a missing source/publisher from the DOI registrant, flagged derived.
+    src_label = clean(w.get("src") or "")
+    derived = 0
+    if not src_label:
+        dl, dpub = derive_source(w)
+        if dl:
+            src_label = dl
+            derived = 1
+            if not (w.get("pubp") or "").strip() and w.get("stype") != "repository":
+                w["pubp"] = dpub
+                w["pub"] = w["pub"] or dpub
+    w["src"] = src_label
+
     lw = None
     if WAIVERS:
         rec = WAIVERS["records"].get(norm_doi(w.get("doi")) or "")
@@ -220,7 +304,7 @@ for w in works:
         dept_hits += 1
     rows.append([
         w["id"][1:] if w["id"] and w["id"][0] == "W" else w["id"],
-        w["t"][:300],
+        clean(w["t"])[:300],
         w["y"],
         w["d"][5:] if w.get("d") else None,
         put_ty(w["ty"].rsplit("/", 1)[-1]),
@@ -245,12 +329,15 @@ for w in works:
         [put_fund(f) for f in w["fu"][:10]],
         w["aw"][:6],
         (redact(w["bare"][0])[:110] if w["bare"] else None),
-        put_pub(bucket),
-        put_imp(imprint),
+        put_pub(clean(bucket)),
+        put_imp(clean(imprint)),
         [s[0] for s in w["sdg"]],                  # UN goal numbers, score >= 0.4
         lw,                                        # library APC waiver record, or null
+        derived,                                   # 1 = source/publisher from DOI prefix
+        1 if (w["id"] in DEAD and not w.get("doi")) else 0,   # retired OpenAlex ID
     ])
 
+I_SRCD = -2          # 'srcd' column, second from the end of each row
 payload = {
     "meta": {
         "institution": "Lehigh University",
@@ -263,6 +350,10 @@ payload = {
         "college_level": COLLEGE_LEVEL,
         "dept_coverage": round(dept_hits / len(rows) * 100, 1),
         "pub_coverage": round(pub_named / len(rows) * 100, 1),
+        "src_derived": sum(r[I_SRCD] for r in rows),
+        "ids_retired": sum(r[-1] for r in rows),
+        "src_missing": sum(1 for w in works if not (w.get("src") or "").strip()),
+        "src_absent_in_openalex": src_absent,
         "sdg_coverage": round(sdg_tagged / len(rows) * 100, 1),
         "pub_repo": PUB_REPO,
         "pub_none": PUB_NONE,
@@ -281,7 +372,8 @@ payload = {
     "tables": tables,
     "cols": ["id", "t", "y", "d", "ty", "c", "f", "oa", "src", "top", "sub",
              "fld", "dom", "la", "na", "ci", "cc", "doi", "rt", "rf",
-             "co", "cn", "dept", "fund", "aw", "bare", "pub", "imp", "sdg", "lw"],
+             "co", "cn", "dept", "fund", "aw", "bare", "pub", "imp", "sdg", "lw",
+             "srcd", "gone"],
     "rows": rows,
 }
 
